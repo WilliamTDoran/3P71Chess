@@ -25,7 +25,16 @@ public class PieceMoves
 
     internal static Position[] BishopMoves(int[][] b, Position start)
     {
-        throw new NotImplementedException();
+        Position[] right = BoardState.line(b, start, 1, -1, BoardState.BoardLength);
+        Position[] left = BoardState.line(b, start, -1, 1, BoardState.BoardLength);
+        Position[] up = BoardState.line(b, start, 1, 1, BoardState.BoardLength);
+        Position[] down = BoardState.line(b, start, -1, -1, BoardState.BoardLength);
+        Position[] ans = new Position[right.Length + left.Length + up.Length + down.Length];
+        for (int i = 0; i < right.Length; i++) ans[i] = right[i];
+        for (int i = 0; i < left.Length; i++) ans[i + right.Length] = left[i];
+        for (int i = 0; i < up.Length; i++) ans[i + left.Length + right.Length] = up[i];
+        for (int i = 0; i < down.Length; i++) ans[i + up.Length + left.Length + right.Length] = down[i];
+        return ans;
     }
 
     internal static Position[] KnightMoves(int[][] b, Position start)
