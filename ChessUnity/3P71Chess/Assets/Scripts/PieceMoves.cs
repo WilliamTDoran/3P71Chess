@@ -10,10 +10,10 @@ public class PieceMoves
         int piece = Math.Abs(b[start.x][start.y]);
         Position[] ans = null;
         if (piece == PieceCode.Pawn) ans = PawnMoves(b, start);
-        else if (piece == PieceCode.Bishop) ans = BishopMoves(b, start);
+        else if (piece == PieceCode.Bishop) ans = BishopMoves(b, start, BoardState.BoardLength);
         else if (piece == PieceCode.Knight) ans = KnightMoves(b, start);
-        else if (piece == PieceCode.Rook) ans = RookMoves(b, start);
-        else if (piece == PieceCode.Queen) ans = QueenMoves(b, start);
+        else if (piece == PieceCode.Rook) ans = RookMoves(b, start, BoardState.BoardLength);
+        else if (piece == PieceCode.Queen) ans = QueenMoves(b, start, BoardState.BoardLength);
         else if (piece == PieceCode.King) ans = KingMoves(b, start);
         return ans;
     }
@@ -23,12 +23,12 @@ public class PieceMoves
         throw new NotImplementedException();
     }
 
-    internal static Position[] BishopMoves(int[][] b, Position start)
+    internal static Position[] BishopMoves(int[][] b, Position start, int length)
     {
-        Position[] right = BoardState.line(b, start, 1, -1, BoardState.BoardLength);
-        Position[] left = BoardState.line(b, start, -1, 1, BoardState.BoardLength);
-        Position[] up = BoardState.line(b, start, 1, 1, BoardState.BoardLength);
-        Position[] down = BoardState.line(b, start, -1, -1, BoardState.BoardLength);
+        Position[] right = BoardState.line(b, start, 1, -1, length);
+        Position[] left = BoardState.line(b, start, -1, 1, length);
+        Position[] up = BoardState.line(b, start, 1, 1, length);
+        Position[] down = BoardState.line(b, start, -1, -1, length);
         Position[] ans = new Position[right.Length + left.Length + up.Length + down.Length];
         for (int i = 0; i < right.Length; i++) ans[i] = right[i];
         for (int i = 0; i < left.Length; i++) ans[i + right.Length] = left[i];
@@ -42,12 +42,12 @@ public class PieceMoves
         throw new NotImplementedException();
     }
 
-    internal static Position[] RookMoves(int[][] b, Position start)
+    internal static Position[] RookMoves(int[][] b, Position start, int length)
     {
-        Position[] right = BoardState.line(b, start, 1, 0, BoardState.BoardLength);
-        Position[] left = BoardState.line(b, start, -1, 0, BoardState.BoardLength);
-        Position[] up = BoardState.line(b, start, 0, 1, BoardState.BoardLength);
-        Position[] down = BoardState.line(b, start, 0, -1, BoardState.BoardLength);
+        Position[] right = BoardState.line(b, start, 1, 0, length);
+        Position[] left = BoardState.line(b, start, -1, 0, length);
+        Position[] up = BoardState.line(b, start, 0, 1, length);
+        Position[] down = BoardState.line(b, start, 0, -1, length);
         Position[] ans = new Position[right.Length + left.Length + up.Length + down.Length];
         for (int i = 0; i < right.Length; i++) ans[i] = right[i];
         for (int i = 0; i < left.Length; i++) ans[i + right.Length] = left[i];
@@ -56,13 +56,19 @@ public class PieceMoves
         return ans;
     }
 
-    internal static Position[] QueenMoves(int[][] b, Position start)
+    internal static Position[] QueenMoves(int[][] b, Position start, int length)
     {
-        throw new NotImplementedException();
+        Position[] diagonal = BishopMoves(b, start, length);
+        Position[] flat = RookMoves(b, start, length);
+        Position[] ans = new Position[diagonal.Length + flat.Length];
+        for (int i = 0; i < diagonal.Length; i++) ans[i] = diagonal[i];
+        for (int i = 0; i < flat.Length; i++) ans[i + diagonal.Length] = flat[i];
+        return ans;
+
     }
 
     internal static Position[] KingMoves(int[][] b, Position start)
     {
-        throw new NotImplementedException();
+        return QueenMoves(b, start, 1);
     }
 }
