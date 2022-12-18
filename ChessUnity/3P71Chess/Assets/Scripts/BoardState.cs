@@ -59,7 +59,7 @@ internal class BoardState : MonoBehaviour
     /// <param name="y">the change along the y (-1, 0, or 1 usually)</param>
     /// <param name="maxRemaining">The max number of positions checked within the function.</param>
     /// <returns>List of positions within the line</returns>
-    public static Position[] line(BoardState b, Position p, int x, int y, int maxRemaining)
+    /*public static Position[] line(BoardState b, Position p, int x, int y, int maxRemaining)
     {
         Position[] pos;
         p.x+=x;
@@ -74,6 +74,31 @@ internal class BoardState : MonoBehaviour
             for (int i=0; i<pos2.Length; i++) pos[i] = pos2[i];
             pos[pos2.Length] = p;
         } else // if in the line & space is taken
+        {
+            pos = new Position[1];
+            pos[0] = p;
+        }
+        return pos;
+    }*/
+
+    //line function with an int array
+    public static Position[] line(int[][] b, Position p, int x, int y, int maxRemaining)
+    {
+        Position[] pos;
+        p.x += x;
+        p.y += y;
+        if (!onBoard(p)) // if not on the board
+        {
+            pos = new Position[0];
+        }
+        else if (maxRemaining > 1 && b[p.x][p.y] == 0) // if in the line & not space is taken
+        {
+            Position[] pos2 = line(b, p, x, y, maxRemaining - 1);
+            pos = new Position[pos2.Length + 1];
+            for (int i = 0; i < pos2.Length; i++) pos[i] = pos2[i];
+            pos[pos2.Length] = p;
+        }
+        else // if in the line & space is taken
         {
             pos = new Position[1];
             pos[0] = p;
