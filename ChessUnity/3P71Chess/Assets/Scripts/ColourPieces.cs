@@ -95,7 +95,7 @@ public class ColourPieces
     }
 
     // returns 0 if no piece, and +-1 depending on the colour
-    int GetPieceColour(int p)
+    internal static int GetPieceColour(int p)
     {
         if (p == 0) return 0;
         return p / Math.Abs(p);

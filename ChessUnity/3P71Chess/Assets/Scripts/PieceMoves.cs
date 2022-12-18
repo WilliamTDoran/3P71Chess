@@ -20,7 +20,7 @@ public class PieceMoves
 
     internal static Position[] PawnMoves(int[][] b, Position start)
     {
-        throw new NotImplementedException();
+        return BoardState.line(b, start, 0, ColourPieces.GetPieceColour(b[start.x][start.y]), 1);
     }
 
     internal static Position[] BishopMoves(int[][] b, Position start, int length)
