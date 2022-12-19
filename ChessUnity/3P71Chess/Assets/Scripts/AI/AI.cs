@@ -8,7 +8,7 @@ public class AI
 {
     internal static BoardEvaluator BE;
 
-    static short maxDepth = 2;
+    static short maxDepth = 4;
 
     public static void init()
     {
