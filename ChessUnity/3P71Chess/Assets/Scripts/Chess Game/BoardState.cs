@@ -66,7 +66,7 @@ internal class BoardState : MonoBehaviour
     }
 
     //line function with an short array
-    internal static Position[] line(short[,] b, short x, short y, short changeX, short changeY, short maxRemaining, bool canCapture)
+    internal static Position[] line(short[,] b, short x, short y, short changeX, short changeY, short maxRemaining, bool canCapture, int colour)
     {
         Position[] pos;
         x += changeX;
@@ -77,24 +77,34 @@ internal class BoardState : MonoBehaviour
         }
         else if (maxRemaining > 1 && b[x,y] == 0) // if in the line & not space is taken
         {
-            Position[] pos2 = line(b, x, y, changeX, changeY, (short)(maxRemaining - 1), canCapture);
-            /*if (ThreatEvaluator.EvaluateThreatened() )
+            Position[] pos2 = line(b, x, y, changeX, changeY, (short)(maxRemaining - 1), canCapture, colour);
+            pos = pos2;
+            int kx;
+            int ky;
+            AI.BE.FindKing(out kx, out ky, b, colour);
+            if (!ThreatEvaluator.EvaluateThreatened(kx, ky, b, colour, false, true))
             {
-
-            }*/
-            pos = new Position[pos2.Length + 1];
-            for (short i = 0; i < pos2.Length; i++) pos[i] = pos2[i];
-            pos[pos2.Length] = new Position(x, y);
+                pos = new Position[pos2.Length + 1];
+                for (short i = 0; i < pos2.Length; i++) pos[i] = pos2[i];
+                pos[pos2.Length] = new Position(x, y);
+            }            
         }
         else // if in the line & space is taken
         {
+            int kx;
+            int ky;
+            AI.BE.FindKing(out kx, out ky, b, colour);
             if (b[x,y] * Instance.pieceSelected[2] > 0 || !canCapture && b[x,y] * Instance.pieceSelected[2] < 0) // if same colour
             {
                 pos = new Position[0];
-            } else
+            }
+            else if(!ThreatEvaluator.EvaluateThreatened(kx, ky, b, colour, false, true))
             {
                 pos = new Position[1];
                 pos[0] = new Position(x, y);
+            } else
+            {
+                pos = new Position[0];
             }
         }
         return pos;

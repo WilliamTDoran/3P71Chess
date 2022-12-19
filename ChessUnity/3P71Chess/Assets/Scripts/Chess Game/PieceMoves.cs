@@ -23,7 +23,7 @@ public class PieceMoves
         Position[] ans;
         short jump = 1;
         if (start.x == 1 && b[start.x,start.y] < 0 || start.x == 6 && b[start.x,start.y] > 0) jump++;
-        ans = BoardState.line(b, start.x, start.y, (short)(-1 * ColourPieces.GetPieceColour(b[start.x,start.y])), 0, jump, false);
+        ans = BoardState.line(b, start.x, start.y, (short)(-1 * ColourPieces.GetPieceColour(b[start.x,start.y])), 0, jump, false, ColourPieces.GetPieceColour(b[start.x, start.y]));
         ans = MustCapture(b, (short)(start.x - ColourPieces.GetPieceColour(b[start.x,start.y])), (short)(start.y + 1), ans);
         ans = MustCapture(b, (short)(start.x - ColourPieces.GetPieceColour(b[start.x,start.y])), (short)(start.y - 1), ans);
         if (BoardState.Instance.enPassant(b, start, 1)) 
@@ -59,10 +59,10 @@ public class PieceMoves
 
     internal static Position[] BishopMoves(short[,] b, Position start, short length)
     {
-        Position[] right = BoardState.line(b, start.x, start.y, 1, -1, length, true);
-        Position[] left = BoardState.line(b, start.x, start.y, -1, 1, length, true);
-        Position[] up = BoardState.line(b, start.x, start.y, 1, 1, length, true);
-        Position[] down = BoardState.line(b, start.x, start.y, -1, -1, length, true);
+        Position[] right = BoardState.line(b, start.x, start.y, 1, -1, length, true, ColourPieces.GetPieceColour(b[start.x,start.y]));
+        Position[] left = BoardState.line(b, start.x, start.y, -1, 1, length, true, ColourPieces.GetPieceColour(b[start.x, start.y]));
+        Position[] up = BoardState.line(b, start.x, start.y, 1, 1, length, true, ColourPieces.GetPieceColour(b[start.x, start.y]));
+        Position[] down = BoardState.line(b, start.x, start.y, -1, -1, length, true, ColourPieces.GetPieceColour(b[start.x, start.y]));
         Position[] ans = new Position[right.Length + left.Length + up.Length + down.Length];
         for (short i = 0; i < right.Length; i++) ans[i] = right[i];
         for (short i = 0; i < left.Length; i++) ans[i + right.Length] = left[i];
@@ -73,7 +73,7 @@ public class PieceMoves
 
     internal static Position[] KnightMoves(short[,] b, Position start)
     {
-        Position[] ans = BoardState.line(b, start.x, start.y, 1, 2, 1, true);
+        Position[] ans = BoardState.line(b, start.x, start.y, 1, 2, 1, true, ColourPieces.GetPieceColour(b[start.x, start.y]));
         ans = addMoves(ans, b, start, 2, 1);
         ans = addMoves(ans, b, start, -1, 2);
         ans = addMoves(ans, b, start, 2, -1);
@@ -87,7 +87,7 @@ public class PieceMoves
     internal static Position[] addMoves(Position[] prev, short[,] b, Position start, short x, short y)
     {
         //Debug.Log("Adding "+x+", "+y);
-        Position[] additional = BoardState.line(b, start.x, start.y, x, y, 1, true);
+        Position[] additional = BoardState.line(b, start.x, start.y, x, y, 1, true, ColourPieces.GetPieceColour(b[start.x, start.y]));
         Position[] ans = new Position[prev.Length + additional.Length];
         for (short i = 0; i < prev.Length; i++) ans[i] = prev[i];
         for (short i = 0; i < additional.Length; i++) ans[i + prev.Length] = additional[i];
@@ -96,10 +96,10 @@ public class PieceMoves
 
     internal static Position[] RookMoves(short[,] b, Position start, short length)
     {
-        Position[] right = BoardState.line(b, start.x, start.y, 1, 0, length, true);
-        Position[] left = BoardState.line(b, start.x, start.y, -1, 0, length, true);
-        Position[] up = BoardState.line(b, start.x, start.y, 0, 1, length, true);
-        Position[] down = BoardState.line(b, start.x, start.y, 0, -1, length, true);
+        Position[] right = BoardState.line(b, start.x, start.y, 1, 0, length, true, ColourPieces.GetPieceColour(b[start.x, start.y]));
+        Position[] left = BoardState.line(b, start.x, start.y, -1, 0, length, true, ColourPieces.GetPieceColour(b[start.x, start.y]));
+        Position[] up = BoardState.line(b, start.x, start.y, 0, 1, length, true, ColourPieces.GetPieceColour(b[start.x, start.y]));
+        Position[] down = BoardState.line(b, start.x, start.y, 0, -1, length, true, ColourPieces.GetPieceColour(b[start.x, start.y]));
         Position[] ans = new Position[right.Length + left.Length + up.Length + down.Length];
         for (short i = 0; i < right.Length; i++) ans[i] = right[i];
         for (short i = 0; i < left.Length; i++) ans[i + right.Length] = left[i];
