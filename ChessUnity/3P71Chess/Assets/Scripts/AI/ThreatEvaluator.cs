@@ -84,7 +84,7 @@ namespace AITesting
             int rightSquare = x + 1;
             int rankY = y - defendingColor;
 
-            if (leftSquare >= 0)
+            if (leftSquare >= 0 && (rankY <= 7 && rankY >= 0))
             {
                 if (configuration[rankY, leftSquare] * -defendingColor == 10)
                 {
@@ -92,7 +92,7 @@ namespace AITesting
                 }
             }
 
-            if (rightSquare <= 7)
+            if (rightSquare <= 7 && (rankY <= 7 && rankY >= 0))
             {
                 if (configuration[rankY, rightSquare] * -defendingColor == 10)
                 {
