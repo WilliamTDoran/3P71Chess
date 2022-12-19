@@ -284,7 +284,7 @@ namespace AITesting
         }
 
 
-        private void FindKing(out int kingX, out int kingY, short[,] configuration, int defendingColor)
+        internal void FindKing(out int kingX, out int kingY, short[,] configuration, int defendingColor)
         {
             kingX = 0;
             kingY = 0;
