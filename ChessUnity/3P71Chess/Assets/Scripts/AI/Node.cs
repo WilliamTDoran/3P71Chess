@@ -7,6 +7,7 @@ public class Node
     internal short[,] config;
     internal Node[] moves;
     internal float heuristic;
+    internal short optimalMove;
 
     Node(short[,] configuration, Position from, Position to)
     {
@@ -19,7 +20,7 @@ public class Node
 
     }
 
-    static void fillMoves(Node n)
+    internal static void fillMoves(Node n)
     {
         n.moves = new Node[0];
         for (short i=0; i<n.config.Length; i++)
@@ -44,5 +45,15 @@ public class Node
         for (int i = 0; i < moves.Length; i++) n[i] = moves[i];
         n[moves.Length] = adding;
         return n;
+    }
+
+    public static Node[] prune(Node[] moves, int length)
+    {
+        Node[] shortN = new Node[length];
+        for (int i=0; i<length; i++)
+        {
+            shortN[i] = moves[i];
+        }
+        return shortN;
     }
 }
