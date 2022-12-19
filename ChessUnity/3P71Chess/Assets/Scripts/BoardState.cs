@@ -106,20 +106,17 @@ internal class BoardState : MonoBehaviour
         }
         else // if in the line & space is taken
         {
-            pos = new Position[1];
-            pos[0] = new Position(x, y);
+            if (Instance.getPiece(x, y) * Instance.pieceSelected[2] > 0) // if same colour
+            {
+                pos = new Position[0];
+            } else
+            {
+                pos = new Position[1];
+                pos[0] = new Position(x, y);
+            }
         }
         return pos;
     }
-
-    /** 
-     * Example ways to use the line function
-     * 
-     * Position[] horizontalLineRight = BoardState.line(board, pos, 1, 0, BoardState.BoardLength);
-     * Position[] DiagonalLineUpRight = BoardState.line(board, pos, 1, 1, BoardState.BoardLength);
-     * Position[] VerticalLineUp = BoardState.line(board, pos, 0, 1, BoardState.BoardLength);
-     * Position[] KnightMovement2Up1Right = BoardState.line(board, pos, 1, 2, 1);
-     **/
 
     public static bool onBoard(int x, int y)
     {
@@ -181,6 +178,9 @@ internal class BoardState : MonoBehaviour
             {
                 valid = true;
                 break;
+            } else
+            {
+                Debug.Log(p.x +" "+ newX + " x : y " + p.y + " " + newY);
             }
         }
         if (!valid) return false;

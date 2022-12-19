@@ -20,8 +20,11 @@ public class PieceMoves
 
     internal static Position[] PawnMoves(int[][] b, Position start)
     {
-        Debug.Log(ColourPieces.GetPieceColour(b[start.x][start.y]));
-        return BoardState.line(b, start.x, start.y, 0, ColourPieces.GetPieceColour(b[start.x][start.y]), 1);
+        Position[] ans;
+        int jump = 1;
+        if (start.x == 1 && b[start.x][start.y] > 0 || start.x == 6 && b[start.x][start.y] < 0) jump++;
+        ans = BoardState.line(b, start.x, start.y, ColourPieces.GetPieceColour(b[start.x][start.y]), 0, jump);
+        return ans;
     }
 
     internal static Position[] BishopMoves(int[][] b, Position start, int length)
