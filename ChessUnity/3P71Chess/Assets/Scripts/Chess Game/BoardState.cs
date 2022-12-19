@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using AITesting;
 
 public class Position
 {
@@ -64,37 +65,6 @@ internal class BoardState : MonoBehaviour
         return getPiece(pos.x, pos.y);
     }
 
-    /// <summary>
-    /// Recursive function that returns a list of positions in a line
-    /// </summary>
-    /// <param name="b">The current board state.</param>
-    /// <param name="p">The previous position within the line</param>
-    /// <param name="changeX">the change along the x (-1, 0, or 1 usually)</param>
-    /// <param name="changeY">the change along the y (-1, 0, or 1 usually)</param>
-    /// <param name="maxRemaining">The max number of positions checked within the function.</param>
-    /// <returns>List of positions within the line</returns>
-    /*public static Position[] line(BoardState b, Position p, short x, short y, short maxRemaining)
-    {
-        Position[] pos;
-        p.x+=x;
-        p.y+=y;
-        if (!onBoard(p)) // if not on the board
-        {
-            pos = new Position[0];
-        } else if (maxRemaining > 1 && b.getPiece(p) == 0) // if in the line & not space is taken
-        {
-            Position[] pos2 = line(b, p, x, y, maxRemaining - 1);
-            pos = new Position[pos2.Length+1];
-            for (short i=0; i<pos2.Length; i++) pos[i] = pos2[i];
-            pos[pos2.Length] = p;
-        } else // if in the line & space is taken
-        {
-            pos = new Position[1];
-            pos[0] = p;
-        }
-        return pos;
-    }*/
-
     //line function with an short array
     internal static Position[] line(short[,] b, short x, short y, short changeX, short changeY, short maxRemaining, bool canCapture)
     {
@@ -108,6 +78,10 @@ internal class BoardState : MonoBehaviour
         else if (maxRemaining > 1 && b[x,y] == 0) // if in the line & not space is taken
         {
             Position[] pos2 = line(b, x, y, changeX, changeY, (short)(maxRemaining - 1), canCapture);
+            /*if (ThreatEvaluator.EvaluateThreatened() )
+            {
+
+            }*/
             pos = new Position[pos2.Length + 1];
             for (short i = 0; i < pos2.Length; i++) pos[i] = pos2[i];
             pos[pos2.Length] = new Position(x, y);
@@ -249,7 +223,7 @@ internal class BoardState : MonoBehaviour
     {
         Instance.canPlay = false;
         Node n = new Node();
-        AI.miniMaxAlgorithm(-1, n, true, float.MaxValue, float.MinValue);
+        AI.miniMaxAlgorithm(-1, n, true, float.MinValue, float.MaxValue);
         Debug.Log("Optimal move: "+n.optimalMove);
             Instance.board = n.moves[n.optimalMove].config;
         //}

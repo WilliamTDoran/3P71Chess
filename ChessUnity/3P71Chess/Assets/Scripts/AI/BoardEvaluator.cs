@@ -15,7 +15,7 @@ namespace AITesting
 {
     internal class BoardEvaluator
     {
-        private const float POSITION_WEIGHT = 0.2f;
+        private const float POSITION_WEIGHT = 0.4f;
 
         private float[,] pawnPositionWeights = new float[,] { {  0.0f,  0.0f,  0.0f,  0.0f,  0.0f,  0.0f,  0.0f,  0.0f },
                                                               {  5.0f,  5.0f,  5.0f,  5.0f,  5.0f,  5.0f,  5.0f,  5.0f },
@@ -23,7 +23,7 @@ namespace AITesting
                                                               {  0.5f,  0.5f,  1.0f,  2.5f,  2.5f,  1.0f,  0.5f,  0.5f },
                                                               {  0.0f,  0.0f,  0.0f,  2.0f,  2.0f,  0.0f,  0.0f,  0.0f },
                                                               {  0.5f, -0.5f, -1.0f,  0.0f,  0.0f, -1.0f, -0.5f,  0.5f },
-                                                              {  0.5f,  1.0f,  1.0f, -2.0f, -2.0f,  1.0f,  1.0f,  0.5f },
+                                                              {  0.5f,  1.0f,  1.0f, -5.0f, -5.0f,  1.0f,  1.0f,  0.5f },
                                                               {  0.0f,  0.0f,  0.0f,  0.0f,  0.0f,  0.0f,  0.0f,  0.0f } };
 
         private float[,] knightPositionWeights = new float[,] { { -5.0f, -4.0f, -3.0f, -3.0f, -3.0f, -3.0f, -4.0f, -5.0f },
