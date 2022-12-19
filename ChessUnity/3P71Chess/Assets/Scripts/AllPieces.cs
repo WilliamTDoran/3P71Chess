@@ -17,15 +17,15 @@ public class AllPieces : MonoBehaviour
     }
 
     [SerializeField]
-    ColourPieces blackPieces;
+    public ColourPieces blackPieces;
     [SerializeField]
-    ColourPieces whitePieces;
+    public ColourPieces whitePieces;
 
     internal void UpdateBoard()
     {
         blackPieces.UpdateBoard(PieceCode.black);
-        Debug.Log("Black Pieces drawn");
+        //Debug.Log("Black Pieces drawn");
         whitePieces.UpdateBoard(PieceCode.white);
-        Debug.Log("White Pieces drawn");
+        //Debug.Log("White Pieces drawn");
     }
 }

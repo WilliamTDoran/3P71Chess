@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -31,19 +32,23 @@ internal class BoardState : MonoBehaviour
     public static int BoardLength = 8;
     int[][] board;
     internal int[] pieceSelected;
+    [SerializeField]
+    private SpriteRenderer turnUI;
+
+    internal Position[] lastMove;
 
     public void Awake()
     {
         instance = this;
-        Debug.Log("Code waking up.");
+        Debug.Log("Setup within Awake");
     }
 
     private void Start()
     {
-        Debug.Log("Code starting.");
+        Debug.Log("Setup starting");
         newBoard();
         AllPieces.Instance.UpdateBoard();
-        Debug.Log("Code done.");
+        Debug.Log("Setup done");
     }
 
     internal int getPiece(int x, int y)
@@ -61,8 +66,8 @@ internal class BoardState : MonoBehaviour
     /// </summary>
     /// <param name="b">The current board state.</param>
     /// <param name="p">The previous position within the line</param>
-    /// <param name="x">the change along the x (-1, 0, or 1 usually)</param>
-    /// <param name="y">the change along the y (-1, 0, or 1 usually)</param>
+    /// <param name="changeX">the change along the x (-1, 0, or 1 usually)</param>
+    /// <param name="changeY">the change along the y (-1, 0, or 1 usually)</param>
     /// <param name="maxRemaining">The max number of positions checked within the function.</param>
     /// <returns>List of positions within the line</returns>
     /*public static Position[] line(BoardState b, Position p, int x, int y, int maxRemaining)
@@ -88,48 +93,45 @@ internal class BoardState : MonoBehaviour
     }*/
 
     //line function with an int array
-    public static Position[] line(int[][] b, Position p, int x, int y, int maxRemaining)
+    internal static Position[] line(int[][] b, int x, int y, int changeX, int changeY, int maxRemaining, bool canCapture)
     {
         Position[] pos;
-        p.x += x;
-        p.y += y;
-        if (!onBoard(p)) // if not on the board
+        x += changeX;
+        y += changeY;
+        if (!onBoard(x, y)) // if not on the board
         {
             pos = new Position[0];
         }
-        else if (maxRemaining > 1 && b[p.x][p.y] == 0) // if in the line & not space is taken
+        else if (maxRemaining > 1 && b[x][y] == 0) // if in the line & not space is taken
         {
-            Position[] pos2 = line(b, p, x, y, maxRemaining - 1);
+            Position[] pos2 = line(b, x, y, changeX, changeY, maxRemaining - 1, canCapture);
             pos = new Position[pos2.Length + 1];
             for (int i = 0; i < pos2.Length; i++) pos[i] = pos2[i];
-            pos[pos2.Length] = p;
+            pos[pos2.Length] = new Position(x, y);
         }
         else // if in the line & space is taken
         {
-            pos = new Position[1];
-            pos[0] = p;
+            if (Instance.getPiece(x, y) * Instance.pieceSelected[2] > 0 || !canCapture && Instance.getPiece(x, y) * Instance.pieceSelected[2] < 0) // if same colour
+            {
+                pos = new Position[0];
+            } else
+            {
+                pos = new Position[1];
+                pos[0] = new Position(x, y);
+            }
         }
         return pos;
     }
 
-    /** 
-     * Example ways to use the line function
-     * 
-     * Position[] horizontalLineRight = BoardState.line(board, pos, 1, 0, BoardState.BoardLength);
-     * Position[] DiagonalLineUpRight = BoardState.line(board, pos, 1, 1, BoardState.BoardLength);
-     * Position[] VerticalLineUp = BoardState.line(board, pos, 0, 1, BoardState.BoardLength);
-     * Position[] KnightMovement2Up1Right = BoardState.line(board, pos, 1, 2, 1);
-     **/
-
-    public static bool onBoard(Position pos)
+    internal static bool onBoard(int x, int y)
     {
         bool on = true;
-        if (pos.x < 0 || pos.x >= BoardLength) on = false;
-        if (pos.y < 0 || pos.y >= BoardLength) on = false;
+        if (x < 0 || x >= BoardLength) on = false;
+        if (y < 0 || y >= BoardLength) on = false;
         return on;
     }
 
-    public void newBoard()
+    internal void newBoard()
     {
         board = new int[BoardLength][];
         for (int i=0; i<board.Length; i++)
@@ -165,16 +167,122 @@ internal class BoardState : MonoBehaviour
         pieceSelected[0] = -1;
         pieceSelected[1] = -1;
         pieceSelected[2] = 1;// who's turn
+        turnUI.color = new Color(255, 255, 255);
+
+        AllPieces.Instance.whitePieces.canCastleKing = true;
+        AllPieces.Instance.whitePieces.canCastleQueen = true;
+        AllPieces.Instance.blackPieces.canCastleKing = true;
+        AllPieces.Instance.blackPieces.canCastleQueen = true;
+
+        lastMove = new Position[2];
     }
 
 
-    public bool move(int oldX, int oldY, int newX, int newY)
+    internal bool move(int oldX, int oldY, int newX, int newY)
     {
         //check if valid move. Returns false if not
+        bool valid = false;
+        Position[] moves = PieceMoves.moves(board, new Position(oldX, oldY));
+        //Debug.Log("Valid Moves include the following:");
+        foreach (Position p in moves)
+        {
+            //Debug.Log(p.x+", "+p.y);
+            if (p.x == newX && p.y == newY)
+            {
+                valid = true;
+                break;
+            } else
+            {
+                Debug.Log(p.x +" "+ newX + " x : y " + p.y + " " + newY);
+            }
+        }
+        if (!valid) return false;
+
+        //castling check
+        if (canCastle(oldX, oldY, newX, newY))
+        {
+            //move rook
+        }
+        else if (Math.Abs(board[oldX][oldY]) == PieceCode.King && oldX == (8 + ColourPieces.GetPieceColour(board[oldX][oldY])) % 9 && oldY == 4 && (newY == 6 || newY == 2))
+        {
+            return false;
+        }
+
+        //Em Passant
+        if (Math.Abs(board[oldX][oldY]) == PieceCode.Pawn && enPassant(new Position(oldX, oldY), 1) && newY == oldY + 1) 
+        {
+            board[oldX][oldY + 1] = 0;
+        }
+        if (Math.Abs(board[oldX][oldY]) == PieceCode.Pawn && enPassant(new Position(oldX, oldY), -1) && newY == oldY - 1)
+        {
+            board[oldX][oldY - 1] = 0;
+        }
+
         board[newX][newY] = board[oldX][oldY];
         board[oldX][oldY] = 0;
+        lastMove[0] = new Position(oldX, oldY);
+        lastMove[1] = new Position(newX, newY);
         pieceSelected[2] *= -1;
+        if (pieceSelected[2] == -1) turnUI.color = new Color(0, 0, 0);
+        else turnUI.color = new Color(255, 255, 255);
         AllPieces.Instance.UpdateBoard();
         return true; // if valid move
+    }
+
+    private bool canCastle(int oldX, int oldY, int newX, int newY)
+    {
+        ColourPieces playing;
+        int row = (8 + ColourPieces.GetPieceColour(board[oldX][oldY])) % 9;
+        if (pieceSelected[2] == -1) playing = AllPieces.Instance.blackPieces;
+        else playing = AllPieces.Instance.whitePieces;
+        if (Math.Abs(board[oldX][oldY]) == PieceCode.King)
+        {
+            if (oldX == row && oldY == 4)
+            {
+                if (newX == row && newY == 6)
+                {
+                    if (playing.canCastleKing && getPiece(row, 5) == 0 && getPiece(row, 6) == 0) 
+                    {
+                        playing.canCastleKing = false;
+                        playing.canCastleQueen = false;
+                        board[oldX][5] = board[oldX][7];
+                        board[oldX][7] = 0;
+                        return true;
+                    } 
+                } else if (newX == row && newY == 2)
+                {
+                    if (playing.canCastleQueen && getPiece(row, 1) == 0 && getPiece(row, 2) == 0 && getPiece(row, 3) == 0)
+                    {
+                        playing.canCastleKing = false;
+                        playing.canCastleQueen = false;
+                        board[oldX][3] = board[oldX][0];
+                        board[oldX][0] = 0;
+                        return true;
+                    }
+                } else
+                {
+                    playing.canCastleKing = false;
+                    playing.canCastleQueen = false;
+                }
+            }
+        } else if (Math.Abs(board[oldX][oldY]) == PieceCode.Rook)
+        {
+            if (oldX == row && oldY == 0) // if rook in original position Left
+            {
+                playing.canCastleQueen = false;
+            } else if (oldX == row && oldY == 7)// if rook in original position right
+            {
+                playing.canCastleKing = false;
+            }
+        }
+        return false;
+    }
+
+    public bool enPassant(Position start, int side)
+    {
+        int jump = -1 * PieceCode.Pawn * pieceSelected[2];
+        if (((start.y + side) % BoardLength > 0 || start.y + side == 0) && board[start.x][start.y + side] == jump && lastMove[1].x == start.x && lastMove[1].y == start.y + side && lastMove[0].x == start.x + (2 * pieceSelected[2])) return true;
+
+        return false;
     }
 }

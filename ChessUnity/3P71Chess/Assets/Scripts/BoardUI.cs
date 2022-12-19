@@ -25,7 +25,7 @@ public class BoardUI : MonoBehaviour
         {
             pieceSelected[0] = x;
             pieceSelected[1] = y;
-            Debug.Log("Selected Piece "+x+","+y);
+            Debug.Log("Selected Piece "+x+","+y+" is "+BoardState.Instance.getPiece(x, y));
             BoardState.Instance.pieceSelected = pieceSelected;
         } else if ((pieceSelected[0] != -1 && pieceSelected[1] != -1)) // Piece has been selected
         {
