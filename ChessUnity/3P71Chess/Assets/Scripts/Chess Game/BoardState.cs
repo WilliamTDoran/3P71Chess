@@ -250,11 +250,7 @@ internal class BoardState : MonoBehaviour
         Instance.canPlay = false;
         Node n = new Node();
         AI.miniMaxAlgorithm(-1, n, true, float.MaxValue, float.MinValue);
-        //if (Instance.board == n.moves[n.optimalMove].config)
-        //{
-          //  AI.miniMaxAlgorithm(-1, n, true, float.MaxValue, float.MinValue);
-        //} else
-        //{
+        Debug.Log("Optimal move: "+n.optimalMove);
             Instance.board = n.moves[n.optimalMove].config;
         //}
         swapTurn();

@@ -40,10 +40,12 @@ public class Node
                 pos = pos + ", " + i + "." + j;
                 Position start = new Position(i, j);
                 Position[] movesPos = PieceMoves.moves(n.config, start);
-                pos = pos + "." +movesPos.Length;
+                //n.heuristic = BoardState.Instance.pieceSelected[2] * AI.BE.EvaluateConfiguration(n.config);
+                pos = pos + "." +movesPos.Length+":"+n.heuristic;
                 for (short k = 0; k < movesPos.Length; k++)
                 {
                     n.moves = addMove(n.moves, new Node(n.config, start, movesPos[k]));
+                    n.moves[k].heuristic = BoardState.Instance.pieceSelected[2] * AI.BE.EvaluateConfiguration(n.moves[k].config);
                 }
             }
         }
