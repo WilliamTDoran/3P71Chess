@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -165,6 +166,11 @@ internal class BoardState : MonoBehaviour
         pieceSelected[1] = -1;
         pieceSelected[2] = 1;// who's turn
         turnUI.color = new Color(255, 255, 255);
+
+        AllPieces.Instance.whitePieces.canCastleKing = true;
+        AllPieces.Instance.whitePieces.canCastleQueen = true;
+        AllPieces.Instance.blackPieces.canCastleKing = true;
+        AllPieces.Instance.blackPieces.canCastleQueen = true;
     }
 
 
@@ -176,7 +182,7 @@ internal class BoardState : MonoBehaviour
         Debug.Log("Valid Moves include the following:");
         foreach (Position p in moves)
         {
-            Debug.Log(p.x+", "+p.y);
+            //Debug.Log(p.x+", "+p.y);
             if (p.x == newX && p.y == newY)
             {
                 valid = true;
@@ -187,7 +193,17 @@ internal class BoardState : MonoBehaviour
             }
         }
         if (!valid) return false;
-        
+
+        //castling check
+        if (canCastle(oldX, oldY, newX, newY))
+        {
+            //move rook
+        }
+        else if (Math.Abs(board[oldX][oldY]) == PieceCode.King && oldX == (8 + ColourPieces.GetPieceColour(board[oldX][oldY])) % 9 && oldY == 4 && (newY == 6 || newY == 2))
+        {
+            return false;
+        }
+
 
         board[newX][newY] = board[oldX][oldY];
         board[oldX][oldY] = 0;
@@ -196,5 +212,50 @@ internal class BoardState : MonoBehaviour
         else turnUI.color = new Color(255, 255, 255);
         AllPieces.Instance.UpdateBoard();
         return true; // if valid move
+    }
+
+    private bool canCastle(int oldX, int oldY, int newX, int newY)
+    {
+        ColourPieces playing;
+        int row = (8 + ColourPieces.GetPieceColour(board[oldX][oldY])) % 9;
+        if (pieceSelected[2] == -1) playing = AllPieces.Instance.blackPieces;
+        else playing = AllPieces.Instance.whitePieces;
+        if (Math.Abs(board[oldX][oldY]) == PieceCode.King)
+        {
+            if (oldX == row && oldY == 4)
+            {
+                if (newX == row && newY == 6)
+                {
+                    if (playing.canCastleKing && getPiece(row, 5) == 0 && getPiece(row, 6) == 0) 
+                    {
+                        playing.canCastleKing = false;
+                        playing.canCastleQueen = false;
+                        return true;
+                    } 
+                } else if (newX == row && newY == 2)
+                {
+                    if (playing.canCastleQueen && getPiece(1, row) == 0 && getPiece(2, row) == 0 && getPiece(3, row) == 0)
+                    {
+                        playing.canCastleKing = false;
+                        playing.canCastleQueen = false;
+                        return true;
+                    }
+                } else
+                {
+                    playing.canCastleKing = false;
+                    playing.canCastleQueen = false;
+                }
+            }
+        } else if (Math.Abs(board[oldX][oldY]) == PieceCode.Rook)
+        {
+            if (oldX == row && oldY == 0) // if rook in original position Left
+            {
+                playing.canCastleQueen = false;
+            } else if (oldX == row && oldY == 7)// if rook in original position right
+            {
+                playing.canCastleKing = false;
+            }
+        }
+        return false;
     }
 }

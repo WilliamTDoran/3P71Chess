@@ -37,6 +37,8 @@ public class ColourPieces
     [SerializeField]
     [Tooltip("Top array length: 6. Piece order: Pawns, Bishops, Knights, Rooks, Queens")]
     public PieceArrays[] Pieces;
+    public bool canCastleQueen;
+    public bool canCastleKing;
 
     public int arrayLocation(int piece)
     {

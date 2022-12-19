@@ -78,6 +78,7 @@ public class PieceMoves
 
     internal static Position[] addMoves(Position[] prev, int[][] b, Position start, int x, int y)
     {
+        Debug.Log("Adding "+x+", "+y);
         Position[] additional = BoardState.line(b, start.x, start.y, x, y, 1, true);
         Position[] ans = new Position[prev.Length + additional.Length];
         for (int i = 0; i < prev.Length; i++) ans[i] = prev[i];
@@ -112,6 +113,12 @@ public class PieceMoves
 
     internal static Position[] KingMoves(int[][] b, Position start)
     {
-        return QueenMoves(b, start, 1);
+        Position[] ans = QueenMoves(b, start, 1);
+        if (start.y == 4)
+        {
+            ans = addMoves(ans, b, start, 0, 2);
+            ans = addMoves(ans, b, start, 0, -2);
+        }
+        return ans;
     }
 }

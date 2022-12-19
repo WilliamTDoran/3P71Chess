@@ -17,9 +17,9 @@ public class AllPieces : MonoBehaviour
     }
 
     [SerializeField]
-    ColourPieces blackPieces;
+    public ColourPieces blackPieces;
     [SerializeField]
-    ColourPieces whitePieces;
+    public ColourPieces whitePieces;
 
     internal void UpdateBoard()
     {
