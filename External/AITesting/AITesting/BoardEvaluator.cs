@@ -88,6 +88,15 @@ namespace AITesting
             sumValue += EvaluateMaterial(configuration);
             sumValue += EvaluatePositions(configuration);
 
+            if (EvaluateCheckmate(configuration, 1))
+            {
+                sumValue += -10000.0f;
+            }
+            if (EvaluateCheckmate(configuration, -1))
+            {
+                sumValue += 10000.0f;
+            }
+
             return sumValue;
         }
 
