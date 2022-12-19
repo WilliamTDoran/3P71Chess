@@ -26,6 +26,16 @@ public class PieceMoves
         ans = BoardState.line(b, start.x, start.y, ColourPieces.GetPieceColour(b[start.x][start.y]), 0, jump, false);
         ans = MustCapture(start.x + ColourPieces.GetPieceColour(b[start.x][start.y]), start.y + 1, ans);
         ans = MustCapture(start.x + ColourPieces.GetPieceColour(b[start.x][start.y]), start.y - 1, ans);
+        jump = -1 * PieceCode.Pawn * BoardState.Instance.pieceSelected[2];
+        Position[] lastMove = BoardState.Instance.lastMove;
+        if (BoardState.Instance.enPassant(start, 1)) 
+        {
+            ans = addMoves(ans, b, start, BoardState.Instance.pieceSelected[2], 1);
+        }
+        if (BoardState.Instance.enPassant(start, -1))
+        {
+            ans = addMoves(ans, b, start, BoardState.Instance.pieceSelected[2], -1);
+        }
         return ans;
     }
 

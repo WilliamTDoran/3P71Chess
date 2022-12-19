@@ -35,18 +35,20 @@ internal class BoardState : MonoBehaviour
     [SerializeField]
     private SpriteRenderer turnUI;
 
+    internal Position[] lastMove;
+
     public void Awake()
     {
         instance = this;
-        Debug.Log("Code waking up.");
+        Debug.Log("Setup within Awake");
     }
 
     private void Start()
     {
-        Debug.Log("Code starting.");
+        Debug.Log("Setup starting");
         newBoard();
         AllPieces.Instance.UpdateBoard();
-        Debug.Log("Code done.");
+        Debug.Log("Setup done");
     }
 
     internal int getPiece(int x, int y)
@@ -91,7 +93,7 @@ internal class BoardState : MonoBehaviour
     }*/
 
     //line function with an int array
-    public static Position[] line(int[][] b, int x, int y, int changeX, int changeY, int maxRemaining, bool canCapture)
+    internal static Position[] line(int[][] b, int x, int y, int changeX, int changeY, int maxRemaining, bool canCapture)
     {
         Position[] pos;
         x += changeX;
@@ -121,7 +123,7 @@ internal class BoardState : MonoBehaviour
         return pos;
     }
 
-    public static bool onBoard(int x, int y)
+    internal static bool onBoard(int x, int y)
     {
         bool on = true;
         if (x < 0 || x >= BoardLength) on = false;
@@ -129,7 +131,7 @@ internal class BoardState : MonoBehaviour
         return on;
     }
 
-    public void newBoard()
+    internal void newBoard()
     {
         board = new int[BoardLength][];
         for (int i=0; i<board.Length; i++)
@@ -171,15 +173,17 @@ internal class BoardState : MonoBehaviour
         AllPieces.Instance.whitePieces.canCastleQueen = true;
         AllPieces.Instance.blackPieces.canCastleKing = true;
         AllPieces.Instance.blackPieces.canCastleQueen = true;
+
+        lastMove = new Position[2];
     }
 
 
-    public bool move(int oldX, int oldY, int newX, int newY)
+    internal bool move(int oldX, int oldY, int newX, int newY)
     {
         //check if valid move. Returns false if not
         bool valid = false;
         Position[] moves = PieceMoves.moves(board, new Position(oldX, oldY));
-        Debug.Log("Valid Moves include the following:");
+        //Debug.Log("Valid Moves include the following:");
         foreach (Position p in moves)
         {
             //Debug.Log(p.x+", "+p.y);
@@ -204,9 +208,20 @@ internal class BoardState : MonoBehaviour
             return false;
         }
 
+        //Em Passant
+        if (Math.Abs(board[oldX][oldY]) == PieceCode.Pawn && enPassant(new Position(oldX, oldY), 1) && newY == oldY + 1) 
+        {
+            board[oldX][oldY + 1] = 0;
+        }
+        if (Math.Abs(board[oldX][oldY]) == PieceCode.Pawn && enPassant(new Position(oldX, oldY), -1) && newY == oldY - 1)
+        {
+            board[oldX][oldY - 1] = 0;
+        }
 
         board[newX][newY] = board[oldX][oldY];
         board[oldX][oldY] = 0;
+        lastMove[0] = new Position(oldX, oldY);
+        lastMove[1] = new Position(newX, newY);
         pieceSelected[2] *= -1;
         if (pieceSelected[2] == -1) turnUI.color = new Color(0, 0, 0);
         else turnUI.color = new Color(255, 255, 255);
@@ -260,6 +275,14 @@ internal class BoardState : MonoBehaviour
                 playing.canCastleKing = false;
             }
         }
+        return false;
+    }
+
+    public bool enPassant(Position start, int side)
+    {
+        int jump = -1 * PieceCode.Pawn * pieceSelected[2];
+        if (((start.y + side) % BoardLength > 0 || start.y + side == 0) && board[start.x][start.y + side] == jump && lastMove[1].x == start.x && lastMove[1].y == start.y + side && lastMove[0].x == start.x + (2 * pieceSelected[2])) return true;
+
         return false;
     }
 }

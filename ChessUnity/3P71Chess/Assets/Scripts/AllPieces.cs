@@ -24,8 +24,8 @@ public class AllPieces : MonoBehaviour
     internal void UpdateBoard()
     {
         blackPieces.UpdateBoard(PieceCode.black);
-        Debug.Log("Black Pieces drawn");
+        //Debug.Log("Black Pieces drawn");
         whitePieces.UpdateBoard(PieceCode.white);
-        Debug.Log("White Pieces drawn");
+        //Debug.Log("White Pieces drawn");
     }
 }
