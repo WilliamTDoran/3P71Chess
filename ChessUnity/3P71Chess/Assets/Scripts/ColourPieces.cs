@@ -14,8 +14,6 @@ public class PieceCode
 
     public static int black = -1;
     public static int white = 1;
-
-    public static int scalar = 1;
 }
 
 [System.Serializable]
@@ -85,7 +83,7 @@ public class ColourPieces
                         placing = Pieces[arrayLocation(p)].get(k);
                         if (!placing.activeInHierarchy)
                         {
-                            placing.transform.position = new Vector2(j*PieceCode.scalar, i*PieceCode.scalar);
+                            placing.transform.position = new Vector2(j, i);
 
                             placing.SetActive(true);
                             break;
