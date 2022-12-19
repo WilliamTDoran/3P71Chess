@@ -22,19 +22,17 @@ public class PieceMoves
     {
         Position[] ans;
         int jump = 1;
-        if (start.x == 1 && b[start.x][start.y] > 0 || start.x == 6 && b[start.x][start.y] < 0) jump++;
-        ans = BoardState.line(b, start.x, start.y, ColourPieces.GetPieceColour(b[start.x][start.y]), 0, jump, false);
-        ans = MustCapture(start.x + ColourPieces.GetPieceColour(b[start.x][start.y]), start.y + 1, ans);
-        ans = MustCapture(start.x + ColourPieces.GetPieceColour(b[start.x][start.y]), start.y - 1, ans);
-        jump = -1 * PieceCode.Pawn * BoardState.Instance.pieceSelected[2];
-        Position[] lastMove = BoardState.Instance.lastMove;
+        if (start.x == 1 && b[start.x][start.y] < 0 || start.x == 6 && b[start.x][start.y] > 0) jump++;
+        ans = BoardState.line(b, start.x, start.y, -1 * ColourPieces.GetPieceColour(b[start.x][start.y]), 0, jump, false);
+        ans = MustCapture(start.x - ColourPieces.GetPieceColour(b[start.x][start.y]), start.y + 1, ans);
+        ans = MustCapture(start.x - ColourPieces.GetPieceColour(b[start.x][start.y]), start.y - 1, ans);
         if (BoardState.Instance.enPassant(start, 1)) 
         {
-            ans = addMoves(ans, b, start, BoardState.Instance.pieceSelected[2], 1);
+            ans = addMoves(ans, b, start, -BoardState.Instance.pieceSelected[2], 1);
         }
         if (BoardState.Instance.enPassant(start, -1))
         {
-            ans = addMoves(ans, b, start, BoardState.Instance.pieceSelected[2], -1);
+            ans = addMoves(ans, b, start, -BoardState.Instance.pieceSelected[2], -1);
         }
         return ans;
     }
@@ -88,7 +86,7 @@ public class PieceMoves
 
     internal static Position[] addMoves(Position[] prev, int[][] b, Position start, int x, int y)
     {
-        Debug.Log("Adding "+x+", "+y);
+        //Debug.Log("Adding "+x+", "+y);
         Position[] additional = BoardState.line(b, start.x, start.y, x, y, 1, true);
         Position[] ans = new Position[prev.Length + additional.Length];
         for (int i = 0; i < prev.Length; i++) ans[i] = prev[i];

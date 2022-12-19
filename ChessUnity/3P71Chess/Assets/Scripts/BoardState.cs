@@ -140,26 +140,26 @@ internal class BoardState : MonoBehaviour
         }
         for (int i=0; i<BoardLength; i++)
         {
-            board[6][i] = PieceCode.black * PieceCode.Pawn;
-            board[1][i] = PieceCode.white * PieceCode.Pawn;
+            board[6][i] = PieceCode.white * PieceCode.Pawn;
+            board[1][i] = PieceCode.black * PieceCode.Pawn;
         }
-        board[7][0] = PieceCode.black * PieceCode.Rook;
-        board[7][1] = PieceCode.black * PieceCode.Knight;
-        board[7][2] = PieceCode.black * PieceCode.Bishop;
-        board[7][3] = PieceCode.black * PieceCode.Queen;
-        board[7][4] = PieceCode.black * PieceCode.King;
-        board[7][5] = PieceCode.black * PieceCode.Bishop;
-        board[7][6] = PieceCode.black * PieceCode.Knight;
-        board[7][7] = PieceCode.black * PieceCode.Rook;
+        board[7][0] = PieceCode.white * PieceCode.Rook;
+        board[7][1] = PieceCode.white * PieceCode.Knight;
+        board[7][2] = PieceCode.white * PieceCode.Bishop;
+        board[7][3] = PieceCode.white * PieceCode.Queen;
+        board[7][4] = PieceCode.white * PieceCode.King;
+        board[7][5] = PieceCode.white * PieceCode.Bishop;
+        board[7][6] = PieceCode.white * PieceCode.Knight;
+        board[7][7] = PieceCode.white * PieceCode.Rook;
 
-        board[0][0] = PieceCode.white * PieceCode.Rook;
-        board[0][1] = PieceCode.white * PieceCode.Knight;
-        board[0][2] = PieceCode.white * PieceCode.Bishop;
-        board[0][3] = PieceCode.white * PieceCode.Queen;
-        board[0][4] = PieceCode.white * PieceCode.King;
-        board[0][5] = PieceCode.white * PieceCode.Bishop;
-        board[0][6] = PieceCode.white * PieceCode.Knight;
-        board[0][7] = PieceCode.white * PieceCode.Rook;
+        board[0][0] = PieceCode.black * PieceCode.Rook;
+        board[0][1] = PieceCode.black * PieceCode.Knight;
+        board[0][2] = PieceCode.black * PieceCode.Bishop;
+        board[0][3] = PieceCode.black * PieceCode.Queen;
+        board[0][4] = PieceCode.black * PieceCode.King;
+        board[0][5] = PieceCode.black * PieceCode.Bishop;
+        board[0][6] = PieceCode.black * PieceCode.Knight;
+        board[0][7] = PieceCode.black * PieceCode.Rook;
 
         Debug.Log("Board Created");
 
@@ -193,17 +193,13 @@ internal class BoardState : MonoBehaviour
                 break;
             } else
             {
-                Debug.Log(p.x +" "+ newX + " x : y " + p.y + " " + newY);
+                //Debug.Log(p.x +" "+ newX + " x : y " + p.y + " " + newY);
             }
         }
         if (!valid) return false;
 
         //castling check
-        if (canCastle(oldX, oldY, newX, newY))
-        {
-            //move rook
-        }
-        else if (Math.Abs(board[oldX][oldY]) == PieceCode.King && oldX == (8 + ColourPieces.GetPieceColour(board[oldX][oldY])) % 9 && oldY == 4 && (newY == 6 || newY == 2))
+        if (!canCastle(oldX, oldY, newX, newY) && Math.Abs(board[oldX][oldY]) == PieceCode.King && oldX == 7-(8 + ColourPieces.GetPieceColour(board[oldX][oldY])) % 9 && oldY == 4 && (newY == 6 || newY == 2))
         {
             return false;
         }
@@ -232,7 +228,7 @@ internal class BoardState : MonoBehaviour
     private bool canCastle(int oldX, int oldY, int newX, int newY)
     {
         ColourPieces playing;
-        int row = (8 + ColourPieces.GetPieceColour(board[oldX][oldY])) % 9;
+        int row = 7 - (8 + ColourPieces.GetPieceColour(board[oldX][oldY])) % 9;
         if (pieceSelected[2] == -1) playing = AllPieces.Instance.blackPieces;
         else playing = AllPieces.Instance.whitePieces;
         if (Math.Abs(board[oldX][oldY]) == PieceCode.King)
@@ -281,7 +277,7 @@ internal class BoardState : MonoBehaviour
     public bool enPassant(Position start, int side)
     {
         int jump = -1 * PieceCode.Pawn * pieceSelected[2];
-        if (((start.y + side) % BoardLength > 0 || start.y + side == 0) && board[start.x][start.y + side] == jump && lastMove[1].x == start.x && lastMove[1].y == start.y + side && lastMove[0].x == start.x + (2 * pieceSelected[2])) return true;
+        if (((start.y + side) % BoardLength > 0 || start.y + side == 0) && board[start.x][start.y + side] == jump && lastMove[1].x == start.x && lastMove[1].y == start.y + side && lastMove[0].x == start.x - (2 * pieceSelected[2])) return true;
 
         return false;
     }

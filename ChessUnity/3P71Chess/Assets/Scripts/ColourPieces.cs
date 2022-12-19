@@ -83,7 +83,7 @@ public class ColourPieces
                         placing = Pieces[arrayLocation(p)].get(k);
                         if (!placing.activeInHierarchy)
                         {
-                            placing.transform.position = new Vector2(j, i);
+                            placing.transform.position = new Vector2(j, BoardState.BoardLength-i-1);
 
                             placing.SetActive(true);
                             break;
