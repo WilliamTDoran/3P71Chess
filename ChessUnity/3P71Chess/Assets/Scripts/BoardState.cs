@@ -88,7 +88,7 @@ internal class BoardState : MonoBehaviour
     }*/
 
     //line function with an int array
-    public static Position[] line(int[][] b, int x, int y, int changeX, int changeY, int maxRemaining)
+    public static Position[] line(int[][] b, int x, int y, int changeX, int changeY, int maxRemaining, bool canCapture)
     {
         Position[] pos;
         x += changeX;
@@ -99,14 +99,14 @@ internal class BoardState : MonoBehaviour
         }
         else if (maxRemaining > 1 && b[x][y] == 0) // if in the line & not space is taken
         {
-            Position[] pos2 = line(b, x, y, changeX, changeY, maxRemaining - 1);
+            Position[] pos2 = line(b, x, y, changeX, changeY, maxRemaining - 1, canCapture);
             pos = new Position[pos2.Length + 1];
             for (int i = 0; i < pos2.Length; i++) pos[i] = pos2[i];
             pos[pos2.Length] = new Position(x, y);
         }
         else // if in the line & space is taken
         {
-            if (Instance.getPiece(x, y) * Instance.pieceSelected[2] > 0) // if same colour
+            if (Instance.getPiece(x, y) * Instance.pieceSelected[2] > 0 || !canCapture && Instance.getPiece(x, y) * Instance.pieceSelected[2] < 0) // if same colour
             {
                 pos = new Position[0];
             } else
