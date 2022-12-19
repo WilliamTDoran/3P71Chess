@@ -6,13 +6,13 @@ using UnityEngine;
 public class BoardUI : MonoBehaviour
 {
     [SerializeField]
-    private int x;
+    private short x;
     [SerializeField]
-    private int y;
+    private short y;
 
     public void clicked()
     {
-        int[] pieceSelected = BoardState.Instance.pieceSelected;
+        short[] pieceSelected = BoardState.Instance.pieceSelected;
 
         Debug.Log("Selected Piece " + x + "," + y + " is " + BoardState.Instance.getPiece(x, y));
         // no piece selected                                        Piece is player's who's turn it is
