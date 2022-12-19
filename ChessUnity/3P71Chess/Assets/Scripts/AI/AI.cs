@@ -29,6 +29,13 @@ public class AI
         if (maximize) Node.fillMoves(n, BoardState.Instance.AITurnVal);
         else Node.fillMoves(n, -BoardState.Instance.AITurnVal);
 
+        if (n.moves.Length <= 0)
+        {
+            n.heuristic = BoardState.Instance.pieceSelected[2] * BE.EvaluateConfiguration(n.config);
+            n.optimalMove = -1;
+            return n;
+        }
+
         float bestF;
 
         if (maximize)
