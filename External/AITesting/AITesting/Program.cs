@@ -1,4 +1,5 @@
 ﻿using AITesting;
+using System.Globalization;
 
 namespace AITesting
 {
@@ -48,7 +49,17 @@ namespace AITesting
             Console.WriteLine(board.EvaluateConfiguration(state2));
             Console.WriteLine(board.EvaluateConfiguration(state3));
             Console.WriteLine(board.EvaluateConfiguration(state4));
-            Console.WriteLine(board.EvaluateKingThreat(0, 4, state1, 1));
+            Console.WriteLine(board.EvaluateCheckmate(state1, 1));
+            /*List<int[]> attackers = new List<int[]>();
+            Console.WriteLine(ThreatEvaluator.EvaluateThreatened(4, 3, state2, 1, out attackers));
+            for (int i = 0; i < attackers.Count; i++)
+            {
+                for (int j = 0; j < 2; j++)
+                {
+                    Console.Write(attackers[i][j] + ", ");
+                }
+                Console.WriteLine();
+            }*/
         }
     }
 }
