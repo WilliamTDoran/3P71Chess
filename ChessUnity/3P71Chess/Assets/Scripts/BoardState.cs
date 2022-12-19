@@ -6,38 +6,54 @@ public class Position
 {
     public int x;
     public int y;
+
+    public Position()
+    {
+        x = 0;
+        y = 0;
+    }
+
+    public Position(int x, int y)
+    {
+        this.x = x;
+        this.y = y;
+    }
 }
 
 //Internal can't be seen by outside code; better for security. Inspector can't see subclasses.
-public enum PieceType
-{
-    None,
-    Pawn,
-    Knight,
-    Bishop,
-    Rook,
-    Queen,
-    King
-}
 
-internal class BoardState
+
+internal class BoardState : MonoBehaviour
 {
+    private static BoardState instance;
+    public static BoardState Instance { get { return instance; } }
+    [HideInInspector]
     public static int BoardLength = 8;
-    PieceType[][] board;
+    int[][] board;
+    internal int[] pieceSelected;
 
-    internal BoardState() // creates a initial board state for game start
+    public void Awake()
     {
-
+        instance = this;
+        Debug.Log("Code waking up.");
     }
 
-    internal BoardState(BoardState prev) // Boardstate + piece moved
+    private void Start()
     {
-
+        Debug.Log("Code starting.");
+        newBoard();
+        AllPieces.Instance.UpdateBoard();
+        Debug.Log("Code done.");
     }
 
-    internal PieceType getPiece(Position pos)
+    internal int getPiece(int x, int y)
     {
-        return board[pos.x][pos.y];
+        return board[x][y];
+    }
+
+    internal int getPiece(Position pos)
+    {
+        return getPiece(pos.x, pos.y);
     }
 
     /// <summary>
@@ -49,7 +65,7 @@ internal class BoardState
     /// <param name="y">the change along the y (-1, 0, or 1 usually)</param>
     /// <param name="maxRemaining">The max number of positions checked within the function.</param>
     /// <returns>List of positions within the line</returns>
-    public static Position[] line(BoardState b, Position p, int x, int y, int maxRemaining)
+    /*public static Position[] line(BoardState b, Position p, int x, int y, int maxRemaining)
     {
         Position[] pos;
         p.x+=x;
@@ -57,13 +73,38 @@ internal class BoardState
         if (!onBoard(p)) // if not on the board
         {
             pos = new Position[0];
-        } else if (maxRemaining > 1 && b.getPiece(p) == PieceType.None) // if in the line & not space is taken
+        } else if (maxRemaining > 1 && b.getPiece(p) == 0) // if in the line & not space is taken
         {
             Position[] pos2 = line(b, p, x, y, maxRemaining - 1);
             pos = new Position[pos2.Length+1];
             for (int i=0; i<pos2.Length; i++) pos[i] = pos2[i];
             pos[pos2.Length] = p;
         } else // if in the line & space is taken
+        {
+            pos = new Position[1];
+            pos[0] = p;
+        }
+        return pos;
+    }*/
+
+    //line function with an int array
+    public static Position[] line(int[][] b, Position p, int x, int y, int maxRemaining)
+    {
+        Position[] pos;
+        p.x += x;
+        p.y += y;
+        if (!onBoard(p)) // if not on the board
+        {
+            pos = new Position[0];
+        }
+        else if (maxRemaining > 1 && b[p.x][p.y] == 0) // if in the line & not space is taken
+        {
+            Position[] pos2 = line(b, p, x, y, maxRemaining - 1);
+            pos = new Position[pos2.Length + 1];
+            for (int i = 0; i < pos2.Length; i++) pos[i] = pos2[i];
+            pos[pos2.Length] = p;
+        }
+        else // if in the line & space is taken
         {
             pos = new Position[1];
             pos[0] = p;
@@ -86,5 +127,54 @@ internal class BoardState
         if (pos.x < 0 || pos.x >= BoardLength) on = false;
         if (pos.y < 0 || pos.y >= BoardLength) on = false;
         return on;
+    }
+
+    public void newBoard()
+    {
+        board = new int[BoardLength][];
+        for (int i=0; i<board.Length; i++)
+        {
+            board[i] = new int[BoardLength];
+        }
+        for (int i=0; i<BoardLength; i++)
+        {
+            board[6][i] = PieceCode.black * PieceCode.Pawn;
+            board[1][i] = PieceCode.white * PieceCode.Pawn;
+        }
+        board[7][0] = PieceCode.black * PieceCode.Rook;
+        board[7][1] = PieceCode.black * PieceCode.Knight;
+        board[7][2] = PieceCode.black * PieceCode.Bishop;
+        board[7][3] = PieceCode.black * PieceCode.Queen;
+        board[7][4] = PieceCode.black * PieceCode.King;
+        board[7][5] = PieceCode.black * PieceCode.Bishop;
+        board[7][6] = PieceCode.black * PieceCode.Knight;
+        board[7][7] = PieceCode.black * PieceCode.Rook;
+
+        board[0][0] = PieceCode.white * PieceCode.Rook;
+        board[0][1] = PieceCode.white * PieceCode.Knight;
+        board[0][2] = PieceCode.white * PieceCode.Bishop;
+        board[0][3] = PieceCode.white * PieceCode.Queen;
+        board[0][4] = PieceCode.white * PieceCode.King;
+        board[0][5] = PieceCode.white * PieceCode.Bishop;
+        board[0][6] = PieceCode.white * PieceCode.Knight;
+        board[0][7] = PieceCode.white * PieceCode.Rook;
+
+        Debug.Log("Board Created");
+
+        pieceSelected = new int[3];
+        pieceSelected[0] = -1;
+        pieceSelected[1] = -1;
+        pieceSelected[2] = 1;// who's turn
+    }
+
+
+    public bool move(int oldX, int oldY, int newX, int newY)
+    {
+        //check if valid move. Returns false if not
+        board[newX][newY] = board[oldX][oldY];
+        board[oldX][oldY] = 0;
+        pieceSelected[2] *= -1;
+        AllPieces.Instance.UpdateBoard();
+        return true; // if valid move
     }
 }
