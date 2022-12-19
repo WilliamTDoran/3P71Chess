@@ -30,7 +30,7 @@ internal class BoardState : MonoBehaviour
     public static BoardState Instance { get { return instance; } }
     [HideInInspector]
     public static short BoardLength = 8;
-    short[][] board;
+    short[,] board;
     internal short[] pieceSelected;
     [SerializeField]
     private SpriteRenderer turnUI;
@@ -53,7 +53,7 @@ internal class BoardState : MonoBehaviour
 
     internal short getPiece(short x, short y)
     {
-        return board[x][y];
+        return board[x,y];
     }
 
     internal short getPiece(Position pos)
@@ -93,7 +93,7 @@ internal class BoardState : MonoBehaviour
     }*/
 
     //line function with an short array
-    internal static Position[] line(short[][] b, short x, short y, short changeX, short changeY, short maxRemaining, bool canCapture)
+    internal static Position[] line(short[,] b, short x, short y, short changeX, short changeY, short maxRemaining, bool canCapture)
     {
         Position[] pos;
         x += changeX;
@@ -102,7 +102,7 @@ internal class BoardState : MonoBehaviour
         {
             pos = new Position[0];
         }
-        else if (maxRemaining > 1 && b[x][y] == 0) // if in the line & not space is taken
+        else if (maxRemaining > 1 && b[x,y] == 0) // if in the line & not space is taken
         {
             Position[] pos2 = line(b, x, y, changeX, changeY, (short)(maxRemaining - 1), canCapture);
             pos = new Position[pos2.Length + 1];
@@ -111,7 +111,7 @@ internal class BoardState : MonoBehaviour
         }
         else // if in the line & space is taken
         {
-            if (b[x][y] * Instance.pieceSelected[2] > 0 || !canCapture && b[x][y] * Instance.pieceSelected[2] < 0) // if same colour
+            if (b[x,y] * Instance.pieceSelected[2] > 0 || !canCapture && b[x,y] * Instance.pieceSelected[2] < 0) // if same colour
             {
                 pos = new Position[0];
             } else
@@ -133,33 +133,29 @@ internal class BoardState : MonoBehaviour
 
     internal void newBoard()
     {
-        board = new short[BoardLength][];
-        for (short i=0; i<board.Length; i++)
-        {
-            board[i] = new short[BoardLength];
-        }
+        board = new short[BoardLength, BoardLength];
         for (short i=0; i<BoardLength; i++)
         {
-            board[6][i] = (short)(PieceCode.white * PieceCode.Pawn);
-            board[1][i] = (short)(PieceCode.black * PieceCode.Pawn);
+            board[6,i] = (short)(PieceCode.white * PieceCode.Pawn);
+            board[1,i] = (short)(PieceCode.black * PieceCode.Pawn);
         }
-        board[7][0] = (short)(PieceCode.white * PieceCode.Rook);
-        board[7][1] = (short)(PieceCode.white * PieceCode.Knight);
-        board[7][2] = (short)(PieceCode.white * PieceCode.Bishop);
-        board[7][3] = (short)(PieceCode.white * PieceCode.Queen);
-        board[7][4] = (short)(PieceCode.white * PieceCode.King);
-        board[7][5] = (short)(PieceCode.white * PieceCode.Bishop);
-        board[7][6] = (short)(PieceCode.white * PieceCode.Knight);
-        board[7][7] = (short)(PieceCode.white * PieceCode.Rook);
+        board[7,0] = (short)(PieceCode.white * PieceCode.Rook);
+        board[7,1] = (short)(PieceCode.white * PieceCode.Knight);
+        board[7,2] = (short)(PieceCode.white * PieceCode.Bishop);
+        board[7,3] = (short)(PieceCode.white * PieceCode.Queen);
+        board[7,4] = (short)(PieceCode.white * PieceCode.King);
+        board[7,5] = (short)(PieceCode.white * PieceCode.Bishop);
+        board[7,6] = (short)(PieceCode.white * PieceCode.Knight);
+        board[7,7] = (short)(PieceCode.white * PieceCode.Rook);
 
-        board[0][0] = (short)(PieceCode.black * PieceCode.Rook);
-        board[0][1] = (short)(PieceCode.black * PieceCode.Knight);
-        board[0][2] = (short)(PieceCode.black * PieceCode.Bishop);
-        board[0][3] = (short)(PieceCode.black * PieceCode.Queen);
-        board[0][4] = (short)(PieceCode.black * PieceCode.King);
-        board[0][5] = (short)(PieceCode.black * PieceCode.Bishop);
-        board[0][6] = (short)(PieceCode.black * PieceCode.Knight);
-        board[0][7] = (short)(PieceCode.black * PieceCode.Rook);
+        board[0,0] = (short)(PieceCode.black * PieceCode.Rook);
+        board[0,1] = (short)(PieceCode.black * PieceCode.Knight);
+        board[0,2] = (short)(PieceCode.black * PieceCode.Bishop);
+        board[0,3] = (short)(PieceCode.black * PieceCode.Queen);
+        board[0,4] = (short)(PieceCode.black * PieceCode.King);
+        board[0,5] = (short)(PieceCode.black * PieceCode.Bishop);
+        board[0,6] = (short)(PieceCode.black * PieceCode.Knight);
+        board[0,7] = (short)(PieceCode.black * PieceCode.Rook);
 
         Debug.Log("Board Created");
 
@@ -182,7 +178,7 @@ internal class BoardState : MonoBehaviour
     {
         //check if valid move. Returns false if not
         bool valid = false;
-        short[][] b = board;
+        short[,] b = board;
         Position[] moves = PieceMoves.moves(board, new Position(oldX, oldY));
         //Debug.Log("Valid Moves include the following:");
         foreach (Position p in moves)
@@ -200,23 +196,23 @@ internal class BoardState : MonoBehaviour
         if (!valid) return false;
 
         //castling check
-        if (!canCastle(b, oldX, oldY, newX, newY) && Math.Abs(board[oldX][oldY]) == PieceCode.King && oldX == 7-(8 + ColourPieces.GetPieceColour(board[oldX][oldY])) % 9 && oldY == 4 && (newY == 6 || newY == 2))
+        if (!canCastle(b, oldX, oldY, newX, newY) && Math.Abs(board[oldX,oldY]) == PieceCode.King && oldX == 7-(8 + ColourPieces.GetPieceColour(board[oldX,oldY])) % 9 && oldY == 4 && (newY == 6 || newY == 2))
         {
             return false;
         }
 
         //Em Passant
-        if (Math.Abs(board[oldX][oldY]) == PieceCode.Pawn && enPassant(b, new Position(oldX, oldY), 1) && newY == oldY + 1) 
+        if (Math.Abs(board[oldX,oldY]) == PieceCode.Pawn && enPassant(b, new Position(oldX, oldY), 1) && newY == oldY + 1) 
         {
-            board[oldX][oldY + 1] = 0;
+            board[oldX,oldY + 1] = 0;
         }
-        if (Math.Abs(board[oldX][oldY]) == PieceCode.Pawn && enPassant(b, new Position(oldX, oldY), -1) && newY == oldY - 1)
+        if (Math.Abs(board[oldX,oldY]) == PieceCode.Pawn && enPassant(b, new Position(oldX, oldY), -1) && newY == oldY - 1)
         {
-            board[oldX][oldY - 1] = 0;
+            board[oldX,oldY - 1] = 0;
         }
 
-        board[newX][newY] = board[oldX][oldY];
-        board[oldX][oldY] = 0;
+        board[newX,newY] = board[oldX,oldY];
+        board[oldX,oldY] = 0;
         lastMove[0] = new Position(oldX, oldY);
         lastMove[1] = new Position(newX, newY);
         pieceSelected[2] *= -1;
@@ -226,13 +222,13 @@ internal class BoardState : MonoBehaviour
         return true; // if valid move
     }
 
-    private bool canCastle(short[][] b, short oldX, short oldY, short newX, short newY)
+    private bool canCastle(short[,] b, short oldX, short oldY, short newX, short newY)
     {
         ColourPieces playing;
-        short row = (short)(7 - (8 + ColourPieces.GetPieceColour(b[oldX][oldY])) % 9);
+        short row = (short)(7 - (8 + ColourPieces.GetPieceColour(b[oldX,oldY])) % 9);
         if (pieceSelected[2] == -1) playing = AllPieces.Instance.blackPieces;
         else playing = AllPieces.Instance.whitePieces;
-        if (Math.Abs(b[oldX][oldY]) == PieceCode.King)
+        if (Math.Abs(b[oldX,oldY]) == PieceCode.King)
         {
             if (oldX == row && oldY == 4)
             {
@@ -242,8 +238,8 @@ internal class BoardState : MonoBehaviour
                     {
                         playing.canCastleKing = false;
                         playing.canCastleQueen = false;
-                        b[oldX][5] = b[oldX][7];
-                        b[oldX][7] = 0;
+                        b[oldX,5] = b[oldX,7];
+                        b[oldX,7] = 0;
                         return true;
                     } 
                 } else if (newX == row && newY == 2)
@@ -252,8 +248,8 @@ internal class BoardState : MonoBehaviour
                     {
                         playing.canCastleKing = false;
                         playing.canCastleQueen = false;
-                        b[oldX][3] = b[oldX][0];
-                        b[oldX][0] = 0;
+                        b[oldX,3] = b[oldX,0];
+                        b[oldX,0] = 0;
                         return true;
                     }
                 } else
@@ -262,7 +258,7 @@ internal class BoardState : MonoBehaviour
                     playing.canCastleQueen = false;
                 }
             }
-        } else if (Math.Abs(b[oldX][oldY]) == PieceCode.Rook)
+        } else if (Math.Abs(b[oldX,oldY]) == PieceCode.Rook)
         {
             if (oldX == row && oldY == 0) // if rook in original position Left
             {
@@ -275,10 +271,10 @@ internal class BoardState : MonoBehaviour
         return false;
     }
 
-    public bool enPassant(short[][] b, Position start, short side)
+    public bool enPassant(short[,] b, Position start, short side)
     {
         short jump = (short)(-1 * PieceCode.Pawn * pieceSelected[2]);
-        if (((start.y + side) % BoardLength > 0 || start.y + side == 0) && b[start.x][start.y + side] == jump && lastMove[1].x == start.x && lastMove[1].y == start.y + side && lastMove[0].x == start.x - (2 * pieceSelected[2])) return true;
+        if (((start.y + side) % BoardLength > 0 || start.y + side == 0) && b[start.x,start.y + side] == jump && lastMove[1].x == start.x && lastMove[1].y == start.y + side && lastMove[0].x == start.x - (2 * pieceSelected[2])) return true;
 
         return false;
     }

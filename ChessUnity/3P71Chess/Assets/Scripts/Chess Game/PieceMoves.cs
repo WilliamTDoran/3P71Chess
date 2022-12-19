@@ -5,9 +5,9 @@ using UnityEngine;
 
 public class PieceMoves
 {
-    internal static Position[] moves(short[][] b, Position start)
+    internal static Position[] moves(short[,] b, Position start)
     {
-        short piece = Math.Abs(b[start.x][start.y]);
+        short piece = Math.Abs(b[start.x,start.y]);
         Position[] ans = null;
         if (piece == PieceCode.Pawn) ans = PawnMoves(b, start);
         else if (piece == PieceCode.Bishop) ans = BishopMoves(b, start, BoardState.BoardLength);
@@ -18,14 +18,14 @@ public class PieceMoves
         return ans;
     }
 
-    internal static Position[] PawnMoves(short[][] b, Position start)
+    internal static Position[] PawnMoves(short[,] b, Position start)
     {
         Position[] ans;
         short jump = 1;
-        if (start.x == 1 && b[start.x][start.y] < 0 || start.x == 6 && b[start.x][start.y] > 0) jump++;
-        ans = BoardState.line(b, start.x, start.y, (short)(-1 * ColourPieces.GetPieceColour(b[start.x][start.y])), 0, jump, false);
-        ans = MustCapture(b, (short)(start.x - ColourPieces.GetPieceColour(b[start.x][start.y])), (short)(start.y + 1), ans);
-        ans = MustCapture(b, (short)(start.x - ColourPieces.GetPieceColour(b[start.x][start.y])), (short)(start.y - 1), ans);
+        if (start.x == 1 && b[start.x,start.y] < 0 || start.x == 6 && b[start.x,start.y] > 0) jump++;
+        ans = BoardState.line(b, start.x, start.y, (short)(-1 * ColourPieces.GetPieceColour(b[start.x,start.y])), 0, jump, false);
+        ans = MustCapture(b, (short)(start.x - ColourPieces.GetPieceColour(b[start.x,start.y])), (short)(start.y + 1), ans);
+        ans = MustCapture(b, (short)(start.x - ColourPieces.GetPieceColour(b[start.x,start.y])), (short)(start.y - 1), ans);
         if (BoardState.Instance.enPassant(b, start, 1)) 
         {
             ans = addMoves(ans, b, start, (short)-BoardState.Instance.pieceSelected[2], 1);
@@ -38,10 +38,10 @@ public class PieceMoves
     }
 
 
-    public static Position[] MustCapture(short[][] b, short x, short y, Position[] ans)
+    public static Position[] MustCapture(short[,] b, short x, short y, Position[] ans)
     {
         // if not on the board or piece cannot be captured
-        if (!BoardState.onBoard(x, y) || b[x][y] * BoardState.Instance.pieceSelected[2] >= 0) return ans;
+        if (!BoardState.onBoard(x, y) || b[x,y] * BoardState.Instance.pieceSelected[2] >= 0) return ans;
         else // if piece can be captured
         {
             Position[] ans2 = new Position[ans.Length + 1];
@@ -57,7 +57,7 @@ public class PieceMoves
 
 
 
-    internal static Position[] BishopMoves(short[][] b, Position start, short length)
+    internal static Position[] BishopMoves(short[,] b, Position start, short length)
     {
         Position[] right = BoardState.line(b, start.x, start.y, 1, -1, length, true);
         Position[] left = BoardState.line(b, start.x, start.y, -1, 1, length, true);
@@ -71,7 +71,7 @@ public class PieceMoves
         return ans;
     }
 
-    internal static Position[] KnightMoves(short[][] b, Position start)
+    internal static Position[] KnightMoves(short[,] b, Position start)
     {
         Position[] ans = BoardState.line(b, start.x, start.y, 1, 2, 1, true);
         ans = addMoves(ans, b, start, 2, 1);
@@ -84,7 +84,7 @@ public class PieceMoves
         return ans;
     }
 
-    internal static Position[] addMoves(Position[] prev, short[][] b, Position start, short x, short y)
+    internal static Position[] addMoves(Position[] prev, short[,] b, Position start, short x, short y)
     {
         //Debug.Log("Adding "+x+", "+y);
         Position[] additional = BoardState.line(b, start.x, start.y, x, y, 1, true);
@@ -94,7 +94,7 @@ public class PieceMoves
         return ans;
     }
 
-    internal static Position[] RookMoves(short[][] b, Position start, short length)
+    internal static Position[] RookMoves(short[,] b, Position start, short length)
     {
         Position[] right = BoardState.line(b, start.x, start.y, 1, 0, length, true);
         Position[] left = BoardState.line(b, start.x, start.y, -1, 0, length, true);
@@ -108,7 +108,7 @@ public class PieceMoves
         return ans;
     }
 
-    internal static Position[] QueenMoves(short[][] b, Position start, short length)
+    internal static Position[] QueenMoves(short[,] b, Position start, short length)
     {
         Position[] diagonal = BishopMoves(b, start, length);
         Position[] flat = RookMoves(b, start, length);
@@ -119,7 +119,7 @@ public class PieceMoves
 
     }
 
-    internal static Position[] KingMoves(short[][] b, Position start)
+    internal static Position[] KingMoves(short[,] b, Position start)
     {
         Position[] ans = QueenMoves(b, start, 1);
         if (start.y == 4)
