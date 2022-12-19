@@ -10,10 +10,10 @@ namespace AITesting
             short[,] state1 = new short[,] { {  -50,  -30,  -32,  -90, -900,  -32,  -30,  -50 },
                                              {  -10,  -10,  -10,  -10,  -10,  -10,  -10,  -10 },
                                              {    0,    0,    0,    0,    0,    0,    0,    0 },
-                                             {    0,    0,    0,    0,  -50,    0,    0,    0 },
                                              {    0,    0,    0,    0,    0,    0,    0,    0 },
-                                             {    0,    0,    0,    0,    0,  -30,    0,    0 },
-                                             {   10,   10,   10,   10,    0,   10,   10,   10 },
+                                             {    0,    0,    0,    0,    0,    0,    0,    0 },
+                                             {    0,    0,    0,    0,    0,    0,    0,    0 },
+                                             {   10,   10,   10,   10,   10,   10,   10,   10 },
                                              {   50,   30,   32,   90,  900,   32,   30,   50 } };
 
             short[,] state2 = new short[,] { {  -50,    0,    0,  -90, -900,  -32,  -30,  -50 },
@@ -50,6 +50,7 @@ namespace AITesting
             Console.WriteLine(board.EvaluateConfiguration(state3));
             Console.WriteLine(board.EvaluateConfiguration(state4));
             Console.WriteLine(board.EvaluateCheckmate(state1, 1));
+            Console.WriteLine(state1[7, 0]);
             /*List<int[]> attackers = new List<int[]>();
             Console.WriteLine(ThreatEvaluator.EvaluateThreatened(4, 3, state2, 1, out attackers));
             for (int i = 0; i < attackers.Count; i++)
