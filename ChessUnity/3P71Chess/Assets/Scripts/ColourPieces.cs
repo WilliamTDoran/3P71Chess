@@ -47,8 +47,8 @@ public class ColourPieces
             throw new Exception();
         }
         if (piece == PieceCode.Pawn) return 0;
-        if (piece == PieceCode.Knight) return 1;
-        if (piece == PieceCode.Bishop) return 2;
+        if (piece == PieceCode.Bishop) return 1;
+        if (piece == PieceCode.Knight) return 2;
         if (piece == PieceCode.Rook) return 3;
         if (piece == PieceCode.Queen) return 4;
         if (piece == PieceCode.King) return 5;

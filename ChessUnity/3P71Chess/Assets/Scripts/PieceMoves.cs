@@ -20,15 +20,16 @@ public class PieceMoves
 
     internal static Position[] PawnMoves(int[][] b, Position start)
     {
-        return BoardState.line(b, start, 0, ColourPieces.GetPieceColour(b[start.x][start.y]), 1);
+        Debug.Log(ColourPieces.GetPieceColour(b[start.x][start.y]));
+        return BoardState.line(b, start.x, start.y, 0, ColourPieces.GetPieceColour(b[start.x][start.y]), 1);
     }
 
     internal static Position[] BishopMoves(int[][] b, Position start, int length)
     {
-        Position[] right = BoardState.line(b, start, 1, -1, length);
-        Position[] left = BoardState.line(b, start, -1, 1, length);
-        Position[] up = BoardState.line(b, start, 1, 1, length);
-        Position[] down = BoardState.line(b, start, -1, -1, length);
+        Position[] right = BoardState.line(b, start.x, start.y, 1, -1, length);
+        Position[] left = BoardState.line(b, start.x, start.y, -1, 1, length);
+        Position[] up = BoardState.line(b, start.x, start.y, 1, 1, length);
+        Position[] down = BoardState.line(b, start.x, start.y, -1, -1, length);
         Position[] ans = new Position[right.Length + left.Length + up.Length + down.Length];
         for (int i = 0; i < right.Length; i++) ans[i] = right[i];
         for (int i = 0; i < left.Length; i++) ans[i + right.Length] = left[i];
@@ -39,7 +40,7 @@ public class PieceMoves
 
     internal static Position[] KnightMoves(int[][] b, Position start)
     {
-        Position[] ans = BoardState.line(b, start, 1, 2, 1);
+        Position[] ans = BoardState.line(b, start.x, start.y, 1, 2, 1);
         ans = addKnightMoves(ans, b, start, 2, 1);
         ans = addKnightMoves(ans, b, start, -1, 2);
         ans = addKnightMoves(ans, b, start, 2, -1);
@@ -52,7 +53,7 @@ public class PieceMoves
 
     internal static Position[] addKnightMoves(Position[] prev, int[][] b, Position start, int x, int y)
     {
-        Position[] additional = BoardState.line(b, start, x, y, 1);
+        Position[] additional = BoardState.line(b, start.x, start.y, x, y, 1);
         Position[] ans = new Position[prev.Length + additional.Length];
         for (int i = 0; i < prev.Length; i++) ans[i] = prev[i];
         for (int i = 0; i < additional.Length; i++) ans[i + prev.Length] = additional[i];
@@ -61,10 +62,10 @@ public class PieceMoves
 
     internal static Position[] RookMoves(int[][] b, Position start, int length)
     {
-        Position[] right = BoardState.line(b, start, 1, 0, length);
-        Position[] left = BoardState.line(b, start, -1, 0, length);
-        Position[] up = BoardState.line(b, start, 0, 1, length);
-        Position[] down = BoardState.line(b, start, 0, -1, length);
+        Position[] right = BoardState.line(b, start.x, start.y, 1, 0, length);
+        Position[] left = BoardState.line(b, start.x, start.y, -1, 0, length);
+        Position[] up = BoardState.line(b, start.x, start.y, 0, 1, length);
+        Position[] down = BoardState.line(b, start.x, start.y, 0, -1, length);
         Position[] ans = new Position[right.Length + left.Length + up.Length + down.Length];
         for (int i = 0; i < right.Length; i++) ans[i] = right[i];
         for (int i = 0; i < left.Length; i++) ans[i + right.Length] = left[i];

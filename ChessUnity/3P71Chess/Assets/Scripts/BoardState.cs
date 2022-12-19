@@ -61,8 +61,8 @@ internal class BoardState : MonoBehaviour
     /// </summary>
     /// <param name="b">The current board state.</param>
     /// <param name="p">The previous position within the line</param>
-    /// <param name="x">the change along the x (-1, 0, or 1 usually)</param>
-    /// <param name="y">the change along the y (-1, 0, or 1 usually)</param>
+    /// <param name="changeX">the change along the x (-1, 0, or 1 usually)</param>
+    /// <param name="changeY">the change along the y (-1, 0, or 1 usually)</param>
     /// <param name="maxRemaining">The max number of positions checked within the function.</param>
     /// <returns>List of positions within the line</returns>
     /*public static Position[] line(BoardState b, Position p, int x, int y, int maxRemaining)
@@ -88,26 +88,26 @@ internal class BoardState : MonoBehaviour
     }*/
 
     //line function with an int array
-    public static Position[] line(int[][] b, Position p, int x, int y, int maxRemaining)
+    public static Position[] line(int[][] b, int x, int y, int changeX, int changeY, int maxRemaining)
     {
         Position[] pos;
-        p.x += x;
-        p.y += y;
-        if (!onBoard(p)) // if not on the board
+        x += changeX;
+        y += changeY;
+        if (!onBoard(x, y)) // if not on the board
         {
             pos = new Position[0];
         }
-        else if (maxRemaining > 1 && b[p.x][p.y] == 0) // if in the line & not space is taken
+        else if (maxRemaining > 1 && b[x][y] == 0) // if in the line & not space is taken
         {
-            Position[] pos2 = line(b, p, x, y, maxRemaining - 1);
+            Position[] pos2 = line(b, x, y, changeX, changeY, maxRemaining - 1);
             pos = new Position[pos2.Length + 1];
             for (int i = 0; i < pos2.Length; i++) pos[i] = pos2[i];
-            pos[pos2.Length] = p;
+            pos[pos2.Length] = new Position(x, y);
         }
         else // if in the line & space is taken
         {
             pos = new Position[1];
-            pos[0] = p;
+            pos[0] = new Position(x, y);
         }
         return pos;
     }
@@ -121,11 +121,11 @@ internal class BoardState : MonoBehaviour
      * Position[] KnightMovement2Up1Right = BoardState.line(board, pos, 1, 2, 1);
      **/
 
-    public static bool onBoard(Position pos)
+    public static bool onBoard(int x, int y)
     {
         bool on = true;
-        if (pos.x < 0 || pos.x >= BoardLength) on = false;
-        if (pos.y < 0 || pos.y >= BoardLength) on = false;
+        if (x < 0 || x >= BoardLength) on = false;
+        if (y < 0 || y >= BoardLength) on = false;
         return on;
     }
 
@@ -171,6 +171,21 @@ internal class BoardState : MonoBehaviour
     public bool move(int oldX, int oldY, int newX, int newY)
     {
         //check if valid move. Returns false if not
+        bool valid = false;
+        Position[] moves = PieceMoves.moves(board, new Position(oldX, oldY));
+        Debug.Log("Valid Moves include the following:");
+        foreach (Position p in moves)
+        {
+            Debug.Log(p.x+", "+p.y);
+            if (p.x == newX && p.y == newY)
+            {
+                valid = true;
+                break;
+            }
+        }
+        if (!valid) return false;
+        
+
         board[newX][newY] = board[oldX][oldY];
         board[oldX][oldY] = 0;
         pieceSelected[2] *= -1;
