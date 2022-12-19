@@ -30,6 +30,7 @@ internal class BoardState : MonoBehaviour
     [HideInInspector]
     public static int BoardLength = 8;
     int[][] board;
+    internal int[] pieceSelected;
 
     public void Awake()
     {
@@ -45,9 +46,14 @@ internal class BoardState : MonoBehaviour
         Debug.Log("Code done.");
     }
 
+    internal int getPiece(int x, int y)
+    {
+        return board[x][y];
+    }
+
     internal int getPiece(Position pos)
     {
-        return board[pos.x][pos.y];
+        return getPiece(pos.x, pos.y);
     }
 
     /// <summary>
@@ -154,5 +160,21 @@ internal class BoardState : MonoBehaviour
         board[0][7] = PieceCode.white * PieceCode.Rook;
 
         Debug.Log("Board Created");
+
+        pieceSelected = new int[3];
+        pieceSelected[0] = -1;
+        pieceSelected[1] = -1;
+        pieceSelected[2] = 1;// who's turn
+    }
+
+
+    public bool move(int oldX, int oldY, int newX, int newY)
+    {
+        //check if valid move. Returns false if not
+        board[newX][newY] = board[oldX][oldY];
+        board[oldX][oldY] = 0;
+        pieceSelected[2] *= -1;
+        AllPieces.Instance.UpdateBoard();
+        return true; // if valid move
     }
 }
