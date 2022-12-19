@@ -26,7 +26,8 @@ public class AI
             n.optimalMove = -1;
             return n;
         }
-        Node.fillMoves(n);
+        if (maximize) Node.fillMoves(n, BoardState.Instance.AITurnVal);
+        else Node.fillMoves(n, -BoardState.Instance.AITurnVal);
 
         float bestF;
 
@@ -37,7 +38,7 @@ public class AI
             for (short passed = 1; passed < n.moves.Length; passed++)
             {
                 Node other = miniMaxAlgorithm(depth, n.moves[passed], false, alpha, beta);
-                Debug.Log("Max: " + max.heuristic+", other: "+other.heuristic);
+                //Debug.Log("Max: " + max.heuristic+", other: "+other.heuristic);
                 bestF = Math.Max(max.heuristic, other.heuristic);
                 if (bestF == other.heuristic)
                 {
@@ -59,7 +60,7 @@ public class AI
             {
                 Node other = miniMaxAlgorithm(depth, n.moves[passed], true, alpha, beta);
 
-                Debug.Log("min: " + min.heuristic + ", other: " + other.heuristic);
+                //Debug.Log("min: " + min.heuristic + ", other: " + other.heuristic);
                 bestF = Math.Min(min.heuristic, other.heuristic);
                 if (bestF == other.heuristic)
                 {

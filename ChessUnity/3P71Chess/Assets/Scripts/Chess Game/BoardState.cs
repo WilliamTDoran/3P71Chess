@@ -34,7 +34,7 @@ internal class BoardState : MonoBehaviour
     internal short[] pieceSelected;
     [SerializeField]
     private SpriteRenderer turnUI;
-    int AITurnVal = -1;
+    internal int AITurnVal = -1;
     internal bool canPlay = true;
 
     internal Position[] lastMove;
@@ -250,7 +250,13 @@ internal class BoardState : MonoBehaviour
         Instance.canPlay = false;
         Node n = new Node();
         AI.miniMaxAlgorithm(-1, n, true, float.MaxValue, float.MinValue);
-        Instance.board = n.moves[n.optimalMove].config;
+        //if (Instance.board == n.moves[n.optimalMove].config)
+        //{
+          //  AI.miniMaxAlgorithm(-1, n, true, float.MaxValue, float.MinValue);
+        //} else
+        //{
+            Instance.board = n.moves[n.optimalMove].config;
+        //}
         swapTurn();
         
     }

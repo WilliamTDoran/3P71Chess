@@ -28,22 +28,26 @@ public class Node
         config = BoardState.Instance.board;
     }
 
-    internal static void fillMoves(Node n)
+    internal static void fillMoves(Node n, int turn)
     {
+        string pos = "";
         n.moves = new Node[0];
         for (short i=0; i<BoardState.BoardLength; i++)
         {
             for (short j=0; j< BoardState.BoardLength; j++)
             {
-                if (n.config[i,j]==0) continue;
+                if (n.config[i,j]*turn <= 0) continue;
+                pos = pos + ", " + i + "." + j;
                 Position start = new Position(i, j);
                 Position[] movesPos = PieceMoves.moves(n.config, start);
+                pos = pos + "." +movesPos.Length;
                 for (short k = 0; k < movesPos.Length; k++)
                 {
                     n.moves = addMove(n.moves, new Node(n.config, start, movesPos[k]));
                 }
             }
         }
+        Debug.Log(pos);
     }
 
 
