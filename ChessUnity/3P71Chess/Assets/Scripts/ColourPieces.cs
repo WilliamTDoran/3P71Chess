@@ -5,12 +5,12 @@ using UnityEngine;
 
 public class PieceCode
 {
-    public static int Pawn = 2;
-    public static int Knight = 6;
-    public static int Bishop = 7;
-    public static int Rook = 10;
-    public static int Queen = 18;
-    public static int King = 50;
+    public static int Pawn = 10;
+    public static int Knight = 30;
+    public static int Bishop = 32;
+    public static int Rook = 50;
+    public static int Queen = 90;
+    public static int King = 900;
 
     public static int black = -1;
     public static int white = 1;

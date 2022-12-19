@@ -39,7 +39,24 @@ public class PieceMoves
 
     internal static Position[] KnightMoves(int[][] b, Position start)
     {
-        throw new NotImplementedException();
+        Position[] ans = BoardState.line(b, start, 1, 2, 1);
+        ans = addKnightMoves(ans, b, start, 2, 1);
+        ans = addKnightMoves(ans, b, start, -1, 2);
+        ans = addKnightMoves(ans, b, start, 2, -1);
+        ans = addKnightMoves(ans, b, start, 1, -2);
+        ans = addKnightMoves(ans, b, start, -2, 1);
+        ans = addKnightMoves(ans, b, start, -1, -2);
+        ans = addKnightMoves(ans, b, start, -2, -1);
+        return ans;
+    }
+
+    internal static Position[] addKnightMoves(Position[] prev, int[][] b, Position start, int x, int y)
+    {
+        Position[] additional = BoardState.line(b, start, x, y, 1);
+        Position[] ans = new Position[prev.Length + additional.Length];
+        for (int i = 0; i < prev.Length; i++) ans[i] = prev[i];
+        for (int i = 0; i < additional.Length; i++) ans[i + prev.Length] = additional[i];
+        return ans;
     }
 
     internal static Position[] RookMoves(int[][] b, Position start, int length)
