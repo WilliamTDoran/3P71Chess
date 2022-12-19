@@ -4,9 +4,9 @@ using UnityEngine;
 
 public class Node
 {
-    protected short[,] config;
-    protected Node[] moves;
-    protected float rating;
+    internal short[,] config;
+    internal Node[] moves;
+    internal float heuristic;
 
     Node(short[,] configuration, Position from, Position to)
     {
@@ -36,6 +36,7 @@ public class Node
             }
         }
     }
+
 
     static Node[] addMove(Node[] moves, Node adding)
     {
