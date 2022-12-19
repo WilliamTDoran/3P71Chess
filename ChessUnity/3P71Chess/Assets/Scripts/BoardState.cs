@@ -230,14 +230,18 @@ internal class BoardState : MonoBehaviour
                     {
                         playing.canCastleKing = false;
                         playing.canCastleQueen = false;
+                        board[oldX][5] = board[oldX][7];
+                        board[oldX][7] = 0;
                         return true;
                     } 
                 } else if (newX == row && newY == 2)
                 {
-                    if (playing.canCastleQueen && getPiece(1, row) == 0 && getPiece(2, row) == 0 && getPiece(3, row) == 0)
+                    if (playing.canCastleQueen && getPiece(row, 1) == 0 && getPiece(row, 2) == 0 && getPiece(row, 3) == 0)
                     {
                         playing.canCastleKing = false;
                         playing.canCastleQueen = false;
+                        board[oldX][3] = board[oldX][0];
+                        board[oldX][0] = 0;
                         return true;
                     }
                 } else
