@@ -48,6 +48,7 @@ namespace AITesting
             Console.WriteLine(board.EvaluateConfiguration(state2));
             Console.WriteLine(board.EvaluateConfiguration(state3));
             Console.WriteLine(board.EvaluateConfiguration(state4));
+            Console.WriteLine(board.EvaluateKingThreat(0, 4, state1, 1));
         }
     }
 }
