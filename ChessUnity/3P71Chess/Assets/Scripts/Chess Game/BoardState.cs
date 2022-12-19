@@ -30,7 +30,7 @@ internal class BoardState : MonoBehaviour
     public static BoardState Instance { get { return instance; } }
     [HideInInspector]
     public static short BoardLength = 8;
-    short[,] board;
+    internal short[,] board;
     internal short[] pieceSelected;
     [SerializeField]
     private SpriteRenderer turnUI;
@@ -174,12 +174,11 @@ internal class BoardState : MonoBehaviour
     }
 
 
-    internal bool move(short oldX, short oldY, short newX, short newY)
+    internal static bool move(ref short[,] b, short oldX, short oldY, short newX, short newY)
     {
         //check if valid move. Returns false if not
         bool valid = false;
-        short[,] b = board;
-        Position[] moves = PieceMoves.moves(board, new Position(oldX, oldY));
+        Position[] moves = PieceMoves.moves(b, new Position(oldX, oldY));
         //Debug.Log("Valid Moves include the following:");
         foreach (Position p in moves)
         {
@@ -196,28 +195,28 @@ internal class BoardState : MonoBehaviour
         if (!valid) return false;
 
         //castling check
-        if (!canCastle(b, oldX, oldY, newX, newY) && Math.Abs(board[oldX,oldY]) == PieceCode.King && oldX == 7-(8 + ColourPieces.GetPieceColour(board[oldX,oldY])) % 9 && oldY == 4 && (newY == 6 || newY == 2))
+        if (!Instance.canCastle(b, oldX, oldY, newX, newY) && Math.Abs(b[oldX,oldY]) == PieceCode.King && oldX == 7-(8 + ColourPieces.GetPieceColour(b[oldX,oldY])) % 9 && oldY == 4 && (newY == 6 || newY == 2))
         {
             return false;
         }
 
         //Em Passant
-        if (Math.Abs(board[oldX,oldY]) == PieceCode.Pawn && enPassant(b, new Position(oldX, oldY), 1) && newY == oldY + 1) 
+        if (Math.Abs(b[oldX,oldY]) == PieceCode.Pawn && Instance.enPassant(b, new Position(oldX, oldY), 1) && newY == oldY + 1) 
         {
-            board[oldX,oldY + 1] = 0;
+            b[oldX,oldY + 1] = 0;
         }
-        if (Math.Abs(board[oldX,oldY]) == PieceCode.Pawn && enPassant(b, new Position(oldX, oldY), -1) && newY == oldY - 1)
+        if (Math.Abs(b[oldX,oldY]) == PieceCode.Pawn && Instance.enPassant(b, new Position(oldX, oldY), -1) && newY == oldY - 1)
         {
-            board[oldX,oldY - 1] = 0;
+            b[oldX,oldY - 1] = 0;
         }
 
-        board[newX,newY] = board[oldX,oldY];
-        board[oldX,oldY] = 0;
-        lastMove[0] = new Position(oldX, oldY);
-        lastMove[1] = new Position(newX, newY);
-        pieceSelected[2] *= -1;
-        if (pieceSelected[2] == -1) turnUI.color = new Color(0, 0, 0);
-        else turnUI.color = new Color(255, 255, 255);
+        b[newX,newY] = b[oldX,oldY];
+        b[oldX,oldY] = 0;
+        Instance.lastMove[0] = new Position(oldX, oldY);
+        Instance.lastMove[1] = new Position(newX, newY);
+        Instance.pieceSelected[2] *= -1;
+        if (Instance.pieceSelected[2] == -1) Instance.turnUI.color = new Color(0, 0, 0);
+        else Instance.turnUI.color = new Color(255, 255, 255);
         AllPieces.Instance.UpdateBoard();
         return true; // if valid move
     }

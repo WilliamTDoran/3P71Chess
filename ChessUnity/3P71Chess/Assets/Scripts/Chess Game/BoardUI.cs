@@ -23,7 +23,7 @@ public class BoardUI : MonoBehaviour
             BoardState.Instance.pieceSelected = pieceSelected;
         } else if ((pieceSelected[0] != -1 && pieceSelected[1] != -1)) // Piece has been selected
         {
-            if (BoardState.Instance.move(pieceSelected[0], pieceSelected[1], x, y))
+            if (BoardState.move(ref BoardState.Instance.board, pieceSelected[0], pieceSelected[1], x, y)) 
             {
                 //Debug.Log("Piece " + pieceSelected[0] + "," + pieceSelected[1] + " moved to " + x + "," + y);
                 pieceSelected[0] = -1;
