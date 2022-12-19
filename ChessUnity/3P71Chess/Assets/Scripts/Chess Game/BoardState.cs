@@ -174,6 +174,8 @@ internal class BoardState : MonoBehaviour
         AllPieces.Instance.blackPieces.canCastleQueen = true;
 
         lastMove = new Position[2];
+
+        AI.init();
     }
 
 
@@ -220,9 +222,12 @@ internal class BoardState : MonoBehaviour
 
         b[newX,newY] = b[oldX,oldY];
         b[oldX,oldY] = 0;
-        Instance.lastMove[0] = new Position(oldX, oldY);
-        Instance.lastMove[1] = new Position(newX, newY);
-        swapTurn();
+        if(Instance.AITurnVal != Instance.pieceSelected[2])
+        {
+            Instance.lastMove[0] = new Position(oldX, oldY);
+            Instance.lastMove[1] = new Position(newX, newY);
+            swapTurn();
+        }
         return true; // if valid move
     }
 
@@ -232,7 +237,11 @@ internal class BoardState : MonoBehaviour
         if (Instance.pieceSelected[2] == -1) Instance.turnUI.color = new Color(0, 0, 0);
         else Instance.turnUI.color = new Color(255, 255, 255);
         AllPieces.Instance.UpdateBoard();
-        if (Instance.AITurnVal == Instance.pieceSelected[2]) AITurn();
+        Debug.Log(Instance.AITurnVal + ", " + Instance.pieceSelected[2]);
+        if (Instance.AITurnVal == Instance.pieceSelected[2])
+        {
+            AITurn();
+        }
         else Instance.canPlay = true;
     }
 

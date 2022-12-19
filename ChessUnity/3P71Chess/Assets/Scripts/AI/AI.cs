@@ -19,10 +19,10 @@ public class AI
     public static Node miniMaxAlgorithm(short depth, Node n, bool maximize, float alpha, float beta)
     {
         depth++;
-        Debug.Log(depth);
         if (depth >= maxDepth)
         {
             n.heuristic = BoardState.Instance.pieceSelected[2] * BE.EvaluateConfiguration(n.config);
+            Debug.Log("End Heuristic: " + n.heuristic);
             n.optimalMove = -1;
             return n;
         }
@@ -37,6 +37,7 @@ public class AI
             for (short passed = 1; passed < n.moves.Length; passed++)
             {
                 Node other = miniMaxAlgorithm(depth, n.moves[passed], false, alpha, beta);
+                Debug.Log("Max: " + max.heuristic+", other: "+other.heuristic);
                 bestF = Math.Max(max.heuristic, other.heuristic);
                 if (bestF == other.heuristic)
                 {
@@ -46,7 +47,7 @@ public class AI
                 alpha = Math.Max(alpha, bestF);
                 if (beta <= alpha)
                 {
-                    n.moves = Node.prune(n.moves, passed + 1);
+                    //n.moves = Node.prune(n.moves, passed + 1);
                     break;
                 }
             }
@@ -57,6 +58,8 @@ public class AI
             for (short passed = 1; passed < n.moves.Length; passed++)
             {
                 Node other = miniMaxAlgorithm(depth, n.moves[passed], true, alpha, beta);
+
+                Debug.Log("min: " + min.heuristic + ", other: " + other.heuristic);
                 bestF = Math.Min(min.heuristic, other.heuristic);
                 if (bestF == other.heuristic)
                 {
@@ -66,7 +69,7 @@ public class AI
                 beta = Math.Min(beta, bestF);
                 if (beta <= alpha)
                 {
-                    n.moves = Node.prune(n.moves, passed + 1);
+                    //n.moves = Node.prune(n.moves, passed + 1);
                     break;
                 }
             }

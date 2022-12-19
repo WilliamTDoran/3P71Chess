@@ -11,7 +11,15 @@ public class Node
 
     public Node(short[,] configuration, Position from, Position to)
     {
-        config = configuration;
+
+        config = new short[BoardState.BoardLength,BoardState.BoardLength];
+        for (int i=0; i< BoardState.BoardLength; i++)
+        {
+            for (int j = 0; j < BoardState.BoardLength; j++)
+            {
+                config[i, j] = configuration[i, j];
+            }
+        }
         BoardState.move(ref config, from.x, from.y, to.x, to.y);
     }
 
