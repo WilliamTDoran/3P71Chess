@@ -8,17 +8,21 @@ public class AI
 {
     static BoardEvaluator BE;
 
+    static short maxDepth = 6;
+
     public static void init()
     {
         BE = new BoardEvaluator();
     }
 
 
-    static Node miniMaxAlgorithm(short depth, Node n, bool maximize, short maxDepth, float alpha, float beta)
+    public static Node miniMaxAlgorithm(short depth, Node n, bool maximize, float alpha, float beta)
     {
-        if (depth == maxDepth)
+        depth++;
+        Debug.Log(depth);
+        if (depth >= maxDepth)
         {
-            n.heuristic = BE.EvaluateConfiguration(n.config);
+            n.heuristic = BoardState.Instance.pieceSelected[2] * BE.EvaluateConfiguration(n.config);
             n.optimalMove = -1;
             return n;
         }
@@ -28,11 +32,11 @@ public class AI
 
         if (maximize)
         {
-            Node max = miniMaxAlgorithm((short)(depth + 1), n.moves[0], false, maxDepth, alpha, beta);
+            Node max = miniMaxAlgorithm(depth, n.moves[0], false, alpha, beta);
             n.optimalMove = 0;
             for (short passed = 1; passed < n.moves.Length; passed++)
             {
-                Node other = miniMaxAlgorithm((short)(depth + 1), n.moves[passed], false, maxDepth, alpha, beta);
+                Node other = miniMaxAlgorithm(depth, n.moves[passed], false, alpha, beta);
                 bestF = Math.Max(max.heuristic, other.heuristic);
                 if (bestF == other.heuristic)
                 {
@@ -49,10 +53,10 @@ public class AI
             return max;
         } else
         {
-            Node min = miniMaxAlgorithm((short)(depth + 1), n.moves[0], true, maxDepth, alpha, beta);
+            Node min = miniMaxAlgorithm(depth, n.moves[0], true, alpha, beta);
             for (short passed = 1; passed < n.moves.Length; passed++)
             {
-                Node other = miniMaxAlgorithm((short)(depth + 1), n.moves[passed], true, maxDepth, alpha, beta);
+                Node other = miniMaxAlgorithm(depth, n.moves[passed], true, alpha, beta);
                 bestF = Math.Min(min.heuristic, other.heuristic);
                 if (bestF == other.heuristic)
                 {

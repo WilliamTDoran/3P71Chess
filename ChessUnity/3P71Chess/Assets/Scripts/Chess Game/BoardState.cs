@@ -34,8 +34,11 @@ internal class BoardState : MonoBehaviour
     internal short[] pieceSelected;
     [SerializeField]
     private SpriteRenderer turnUI;
+    int AITurnVal = -1;
+    internal bool canPlay = true;
 
     internal Position[] lastMove;
+
 
     public void Awake()
     {
@@ -180,18 +183,23 @@ internal class BoardState : MonoBehaviour
         bool valid = false;
         Position[] moves = PieceMoves.moves(b, new Position(oldX, oldY));
         //Debug.Log("Valid Moves include the following:");
-        foreach (Position p in moves)
+        if (moves != null)
         {
-            //Debug.Log(p.x+", "+p.y);
-            if (p.x == newX && p.y == newY)
+            foreach (Position p in moves)
             {
-                valid = true;
-                break;
-            } else
-            {
-                //Debug.Log(p.x +" "+ newX + " x : y " + p.y + " " + newY);
+                //Debug.Log(p.x+", "+p.y);
+                if (p.x == newX && p.y == newY)
+                {
+                    valid = true;
+                    break;
+                }
+                else
+                {
+                    //Debug.Log(p.x +" "+ newX + " x : y " + p.y + " " + newY);
+                }
             }
         }
+        
         if (!valid) return false;
 
         //castling check
@@ -214,11 +222,28 @@ internal class BoardState : MonoBehaviour
         b[oldX,oldY] = 0;
         Instance.lastMove[0] = new Position(oldX, oldY);
         Instance.lastMove[1] = new Position(newX, newY);
+        swapTurn();
+        return true; // if valid move
+    }
+
+    private static void swapTurn()
+    {
         Instance.pieceSelected[2] *= -1;
         if (Instance.pieceSelected[2] == -1) Instance.turnUI.color = new Color(0, 0, 0);
         else Instance.turnUI.color = new Color(255, 255, 255);
         AllPieces.Instance.UpdateBoard();
-        return true; // if valid move
+        if (Instance.AITurnVal == Instance.pieceSelected[2]) AITurn();
+        else Instance.canPlay = true;
+    }
+
+    public static void AITurn()
+    {
+        Instance.canPlay = false;
+        Node n = new Node();
+        AI.miniMaxAlgorithm(-1, n, true, float.MaxValue, float.MinValue);
+        Instance.board = n.moves[n.optimalMove].config;
+        swapTurn();
+        
     }
 
     private bool canCastle(short[,] b, short oldX, short oldY, short newX, short newY)
