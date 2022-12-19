@@ -9,6 +9,7 @@ using System.Runtime.InteropServices;
 using System.Security.AccessControl;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Xsl;
 
 namespace AITesting
 {
@@ -86,6 +87,15 @@ namespace AITesting
 
             sumValue += EvaluateMaterial(configuration);
             sumValue += EvaluatePositions(configuration);
+
+            if (EvaluateCheckmate(configuration, 1))
+            {
+                sumValue += -10000.0f;
+            }
+            if (EvaluateCheckmate(configuration, -1))
+            {
+                sumValue += 10000.0f;
+            }
 
             return sumValue;
         }
@@ -208,21 +218,74 @@ namespace AITesting
             int kingY = 0;
             FindKing(out kingX, out kingY, configuration, defendingColor);
 
-            if (!EvaluateThreatened(kingX, kingY, configuration, defendingColor))
+            List<int[]> attackers;
+            if (!ThreatEvaluator.EvaluateThreatened(kingX, kingY, configuration, defendingColor, true, true, out attackers))
             {
                 return false;
             }
+            if (attackers.Count == 1)
+            {
+                if (ThreatEvaluator.EvaluateThreatened(attackers[0][0], attackers[0][1], configuration, -defendingColor, true, true))
+                {
+                    return false;
+                }
 
-            int validSquares = 0;
+                int attackerX = attackers[0][0];
+                int attackerY = attackers[0][1];
+
+                if (configuration[attackerY, attackerX] * -defendingColor == 32 || configuration[attackerY, attackerX] * -defendingColor == 50 || configuration[attackerY, attackerX] * -defendingColor == 90)
+                {
+                    List<int[]> intermediateSpaces;
+                    FindIntermediateSpaces(kingX, kingY, attackerX, attackerY, configuration, defendingColor, out intermediateSpaces);
+
+                    for (int i = 0; i < intermediateSpaces.Count; i++)
+                    {
+                        if (ThreatEvaluator.EvaluateThreatened(intermediateSpaces[i][0], intermediateSpaces[i][1], configuration, -defendingColor, false, false))
+                        {
+                            return false;
+                        }
+
+                        if (defendingColor < 0) //this is super gross
+                        {
+                            if (intermediateSpaces[i][1] == 3 || intermediateSpaces[i][1] == 2)
+                            {
+                                if (configuration[1, intermediateSpaces[i][0]] == -10)
+                                {
+                                    return false;
+                                }
+                            }
+                        }
+                        if (defendingColor > 0)
+                        {
+                            if (intermediateSpaces[i][1] == 4 || intermediateSpaces[i][1] == 5)
+                            {
+                                if (configuration[6, intermediateSpaces[i][0]] == 10)
+                                {
+                                    return false;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
             for (int i = 0; i < 8; i++)
             {
                 int xDisplacement = ((i + 2) % 3) - 1;
-                int yDisplacement = (((i / 3) + 2) %3) - 1;
+                int yDisplacement = (((i / 3) + 2) % 3) - 1;
+
                 int xOut;
                 int yOut;
-                if (GetInboundsOffset(kingX, kingY, xDisplacement, yDisplacement, out xOut, out yOut))
+
+                if (ThreatEvaluator.GetInboundsOffset(kingX, kingY, xDisplacement, yDisplacement, out xOut, out yOut))
                 {
-                    validSquares++;
+                    if (!(ThreatEvaluator.EvaluateThreatened(xOut, yOut, configuration, defendingColor, true, true)))
+                    {
+                        if (configuration[yOut, xOut] <= defendingColor)
+                        {
+                            return false;
+                        }
+                    }
                 }
             }
 
@@ -249,277 +312,84 @@ namespace AITesting
         }
 
 
-        public bool EvaluateThreatened(int x, int y, short[,] configuration, int defendingColor)
+        private void FindIntermediateSpaces(int defenderX, int defenderY, int attackerX, int attackerY, short[,] configuration, int defendingColor, out List<int[]> spaces)
         {
-            bool threatened = false;
+            spaces = new List<int[]>();
 
-            threatened = threatened || EvaluatePawnThreat(x, y, configuration, defendingColor);
-            threatened = threatened || EvaluateKnightThreat(x, y, configuration, defendingColor);
-            threatened = threatened || EvaluateDiagonalThreat(x, y, configuration, defendingColor);
-            threatened = threatened || EvaluateStraightThreat(x, y, configuration, defendingColor);
-            threatened = threatened || EvaluateKingThreat(x, y, configuration, defendingColor);
-
-            return threatened;
+            if (defenderX == attackerX)
+            {
+                FindVerticalSpaces(defenderX, defenderY, attackerY, configuration, defendingColor, out spaces);
+            }
+            else if (defenderY == attackerY)
+            {
+                FindHorizontalSpaces(defenderY, defenderX, attackerX, configuration, defendingColor, out spaces);
+            }
+            else
+            {
+                FindDiagonalSpaces(defenderX, defenderY, attackerX, attackerY, configuration, defendingColor, out spaces);
+            }
         }
 
 
-        private bool EvaluatePawnThreat(int x, int y, short[,] configuration, int defendingColor)
+        private void FindVerticalSpaces(int x, int defenderY, int attackerY, short[,] configuration, int defendingColor, out List<int[]> spaces)
         {
-            bool threatened = false;
+            spaces = new List<int[]>();
 
-            if ((defendingColor < 0 && y >= 6) || (defendingColor > 1 && y <= 1)) //Pawns can't take the row they start in, or the one behind it
+            if (defenderY > attackerY)
             {
-                return false;
-            }
-
-            int leftSquare = x - 1;
-            int rightSquare = x + 1;
-            int rankY = y - defendingColor;
-
-            if (leftSquare >= 0)
-            {
-                if (configuration[rankY, leftSquare] * -defendingColor == 10)
+                for (int i = defenderY - 1; i > attackerY; i--)
                 {
-                    threatened = true;
+                    spaces.Add(new int[] { x, i });
                 }
             }
 
-            if (rightSquare <= 7)
+            if (defenderY < attackerY)
             {
-                if (configuration[rankY, rightSquare] * -defendingColor == 10)
+                for (int i = defenderY + 1; i < attackerY; i++)
                 {
-                    threatened = true;
+                    spaces.Add(new int[] { x, i });
+                }
+            }
+        }
+
+
+        private void FindHorizontalSpaces(int y, int defenderX, int attackerX, short[,] configuration, int defendingColor, out List<int[]> spaces)
+        {
+            spaces = new List<int[]>();
+
+            if (defenderX > attackerX)
+            {
+                for (int i = defenderX - 1; i > attackerX; i--)
+                {
+                    spaces.Add(new int[] { i, y });
                 }
             }
 
-            return threatened;
-        }
-
-
-        /// <summary>
-        /// It checks if a square is threatened by a knight
-        /// </summary>
-        /// <param name="x">The x coordinate of the square to check</param>
-        /// <param name="y">The y coordinate of the square to check</param>
-        /// <param name="configuration">The board state</param>
-        /// <param name="defendingColor">1 for white, -1 for black</param>
-        /// <returns>True if the square is threatened by a knight</returns>
-        public bool EvaluateKnightThreat(int x, int y, short[,] configuration, int defendingColor)
-        {
-            bool threatened = false;
-
-            threatened = threatened || CastL(x, y, configuration, defendingColor, 1, 2, 30);
-            threatened = threatened || CastL(x, y, configuration, defendingColor, 2, 1, 30);
-            threatened = threatened || CastL(x, y, configuration, defendingColor, 2, -1, 30);
-            threatened = threatened || CastL(x, y, configuration, defendingColor, 1, -2, 30);
-            threatened = threatened || CastL(x, y, configuration, defendingColor, -1, -2, 30);
-            threatened = threatened || CastL(x, y, configuration, defendingColor, -2, -1, 30);
-            threatened = threatened || CastL(x, y, configuration, defendingColor, -2, 1, 30);
-            threatened = threatened || CastL(x, y, configuration, defendingColor, -1, 2, 30);
-
-            return threatened;
-        }
-
-
-        private bool GetInboundsOffset(int x, int y, int xDisplacement, int yDisplacement, out int xFinal, out int yFinal)
-        {
-            xFinal = 0;
-            yFinal = 0;
-
-            xFinal = x + xDisplacement;
-            yFinal = y + yDisplacement;
-
-            if (xFinal < 0 || xFinal > 7)
+            if (defenderX < attackerX)
             {
-                xFinal = -1; yFinal = -1;
-                return false;
-            }
-
-            if (yFinal < 0 || yFinal > 7)
-            {
-                xFinal= -1; yFinal = -1;
-                return false;
-            }
-
-            return true;
-        }
-
-
-        private bool CastL(int x, int y, short[,] configuration, int defendingColor, int xDisplacement, int yDisplacement, int pieceCheck)
-        {
-            int checkX, checkY;
-            if (GetInboundsOffset(x, y, xDisplacement, yDisplacement, out checkX, out checkY))
-            {
-                if (configuration[checkY, checkX] * -defendingColor == pieceCheck)
+                for (int i = defenderX + 1; i < attackerX; i++)
                 {
-                    return true;
+                    spaces.Add(new int[] { i, y });
                 }
             }
-
-            return false;
         }
 
 
-        private bool EvaluateDiagonalThreat(int x, int y, short[,] configuration, int defendingColor)
+        private void FindDiagonalSpaces(int defenderX, int defenderY, int attackerX, int attackerY, short[,] configuration, int defendingColor, out List<int[]> spaces)
         {
-            bool threatened = false;
+            spaces = new List<int[]>();
 
-            threatened = threatened || CastDiagonal(x, y, configuration, defendingColor, -1, -1); //Top left
-            threatened = threatened || CastDiagonal(x, y, configuration, defendingColor, 1, -1); //Top right
-            threatened = threatened || CastDiagonal(x, y, configuration, defendingColor, 1, 1); //Bottom right
-            threatened = threatened || CastDiagonal(x, y, configuration, defendingColor, -1, 1); //Bottom left
+            int xDisplacement = defenderX < attackerX ? 1 : -1;
+            int yDisplacement = defenderY < attackerY ? 1 : -1;
+            int numSpaces = Math.Abs(defenderX - attackerX) - 1;
 
-            return threatened;
-        }
-
-        /// <summary>
-        /// Checks a diagonal line for queens and bishops
-        /// </summary>
-        /// <param name="x">x coordinate of target square</param>
-        /// <param name="y">x coordinate of target square</param>
-        /// <param name="configuration">board state</param>
-        /// <param name="defendingColor">1 for white, -1 for black</param>
-        /// <param name="xPolarity">1 or -1</param>
-        /// <param name="yPolarity">1 or -1</param>
-        /// <returns></returns>
-        private bool CastDiagonal(int x, int y, short[,] configuration, int defendingColor, int xPolarity, int yPolarity)
-        {
-            for (int i = 1; i <= 8; i++)
+            for (int i = 1; i <= numSpaces; i++)
             {
-                int targetX = x + (xPolarity * i);
-                int targetY = y + (yPolarity * i);
-                if (targetX >= 0 && targetY >= 0 && targetX <= 7 && targetY <= 7)
-                {
-                    short targetSquareContents = configuration[targetY, targetX];
-                    if (targetSquareContents == 0)
-                    {
-                        continue;
-                    }
-                    else if (targetSquareContents * -defendingColor == 32 || targetSquareContents * -defendingColor == 90)
-                    {
-                        return true;
-                    }
-                    else
-                    {
-                        break;
-                    }
-                }
-                else
-                {
-                    break;
-                }
+                int xOut;
+                int yOut;
+                ThreatEvaluator.GetInboundsOffset(defenderX, defenderY, i * xDisplacement, i * yDisplacement, out xOut, out yOut);
+                spaces.Add(new int[] { xOut, yOut });
             }
-
-            return false;
-        }
-
-
-        private bool EvaluateStraightThreat(int x, int y, short[,] configuration, int defendingColor)
-        {
-            bool threatened = false;
-
-            threatened = threatened || CastVerticalLine(x, y, configuration, defendingColor, 1);
-            threatened = threatened || CastVerticalLine(x, y, configuration, defendingColor, -1);
-            threatened = threatened || CastHorizontalLine(x, y, configuration, defendingColor, 1);
-            threatened = threatened || CastHorizontalLine(x, y, configuration, defendingColor, -1);
-
-            return threatened;
-        }
-
-
-        /// <summary>
-        /// Checks vertical lines for rooks or queens
-        /// </summary>
-        /// <param name="x">x coord of the target square</param>
-        /// <param name="y">y coord of the target square</param>
-        /// <param name="configuration">the board state</param>
-        /// <param name="defendingColor">1 for white, -1 for black</param>
-        /// <param name="direction">1 for down, -1 for up</param>
-        /// <returns></returns>
-        private bool CastVerticalLine(int x, int y, short[,] configuration, int defendingColor, int direction)
-        {
-            for (int i = 1; i <= 8; i++)
-            {
-                int targetSquare = y + (i * direction);
-                if (targetSquare <= 7 && targetSquare >= 0)
-                {
-                    short targetSquareContents = configuration[targetSquare, x];
-                    if (targetSquareContents == 0)
-                    {
-                        continue;
-                    }
-                    else if (targetSquareContents * -defendingColor == 50 || targetSquareContents * -defendingColor == 90)
-                    {
-                        return true;
-                    }
-                    else
-                    {
-                        break;
-                    }
-                }
-                else
-                {
-                    break;
-                }
-            }
-
-            return false;
-        }
-
-
-        /// <summary>
-        /// Checks horizontal lines for rooks or queens
-        /// </summary>
-        /// <param name="x">x coord of the target square</param>
-        /// <param name="y">y coord of the target square</param>
-        /// <param name="configuration">the board state</param>
-        /// <param name="defendingColor">1 for white, -1 for black</param>
-        /// <param name="direction">1 for right, -1 for left</param>
-        /// <returns></returns>
-        private bool CastHorizontalLine(int x, int y, short[,] configuration, int defendingColor, int direction)
-        {
-            for (int i = 1; i <= 8; i++)
-            {
-                int targetSquare = x + (i * direction);
-                if (targetSquare <= 7 && targetSquare >= 0)
-                {
-                    short targetSquareContents = configuration[y, targetSquare];
-                    if (targetSquareContents == 0)
-                    {
-                        continue;
-                    }
-                    else if (targetSquareContents * -defendingColor == 50 || targetSquareContents * -defendingColor == 90)
-                    {
-                        return true;
-                    }
-                    else
-                    {
-                        break;
-                    }
-                }
-                else
-                {
-                    break;
-                }
-            }
-
-            return false;
-        }
-
-
-        public bool EvaluateKingThreat(int x, int y, short[,] configuration, int defendingColor)
-        {
-            bool threatened = false;
-
-            for (int i = 0; i < 8; i++)
-            {
-                int xDisplacement = ((i + 2) % 3) - 1;
-                int yDisplacement = (((i / 3) + 2) % 3) - 1;
-                threatened = CastL(x, y, configuration, defendingColor, xDisplacement, yDisplacement, 900);
-                if (threatened) { break; }
-            }
-
-            return threatened;
         }
     }
 }
