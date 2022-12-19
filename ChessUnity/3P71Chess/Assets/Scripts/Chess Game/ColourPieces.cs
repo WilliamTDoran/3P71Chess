@@ -5,15 +5,15 @@ using UnityEngine;
 
 public class PieceCode
 {
-    public static int Pawn = 10;
-    public static int Knight = 30;
-    public static int Bishop = 32;
-    public static int Rook = 50;
-    public static int Queen = 90;
-    public static int King = 900;
+    public static short Pawn = 10;
+    public static short Knight = 30;
+    public static short Bishop = 32;
+    public static short Rook = 50;
+    public static short Queen = 90;
+    public static short King = 900;
 
-    public static int black = -1;
-    public static int white = 1;
+    public static short black = -1;
+    public static short white = 1;
 }
 
 [System.Serializable]
@@ -21,8 +21,8 @@ public class PieceArrays
 {
     [SerializeField]
     private GameObject[] Pieces;
-    public int length { get { return Pieces.Length; } }
-    public GameObject get(int i)
+    public short length { get { return (short)Pieces.Length; } }
+    public GameObject get(short i)
     {
         return Pieces[i];
     }
@@ -38,7 +38,7 @@ public class ColourPieces
     public bool canCastleQueen;
     public bool canCastleKing;
 
-    public int arrayLocation(int piece)
+    public short arrayLocation(short piece)
     {
         piece = Math.Abs(piece);
         if (piece == 0)
@@ -56,34 +56,34 @@ public class ColourPieces
         throw new Exception();
     }
 
-    internal void UpdateBoard(int thisColour)
+    internal void UpdateBoard(short thisColour)
     {
         //disable all pieces
-        for (int i = 0; i < Pieces.Length; i++)
+        for (short i = 0; i < Pieces.Length; i++)
         {
-            for (int j = 0; j < Pieces[i].length; j++)
+            for (short j = 0; j < Pieces[i].length; j++)
             {
                 Pieces[i].get(j).SetActive(false);
             }
         }
 
         //For every spot on the board
-        for (int i = 0; i < BoardState.BoardLength; i++)
+        for (short i = 0; i < BoardState.BoardLength; i++)
         {
-            for (int j = 0; j < BoardState.BoardLength; j++)
+            for (short j = 0; j < BoardState.BoardLength; j++)
             {
                 //If it is a piece & matches the colour
-                int p = BoardState.Instance.getPiece(new Position(i, j));
+                short p = BoardState.Instance.getPiece(new Position(i, j));
                 if (GetPieceColour(p) == thisColour)
                 {
                     //Move next disabled piece of that type to it's position & set to active
                     GameObject placing;
-                    for (int k=0; k<Pieces[arrayLocation(p)].length; k++)
+                    for (short k=0; k<Pieces[arrayLocation(p)].length; k++)
                     {
                         placing = Pieces[arrayLocation(p)].get(k);
                         if (!placing.activeInHierarchy)
                         {
-                            placing.transform.position = new Vector2(j, i);
+                            placing.transform.position = new Vector2(j, BoardState.BoardLength-i-1);
 
                             placing.SetActive(true);
                             break;
@@ -95,9 +95,9 @@ public class ColourPieces
     }
 
     // returns 0 if no piece, and +-1 depending on the colour
-    internal static int GetPieceColour(int p)
+    internal static short GetPieceColour(short p)
     {
         if (p == 0) return 0;
-        return p / Math.Abs(p);
+        return (short)(p / Math.Abs(p));
     }
 }
