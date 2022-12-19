@@ -31,6 +31,8 @@ internal class BoardState : MonoBehaviour
     public static int BoardLength = 8;
     int[][] board;
     internal int[] pieceSelected;
+    [SerializeField]
+    private SpriteRenderer turnUI;
 
     public void Awake()
     {
@@ -162,6 +164,7 @@ internal class BoardState : MonoBehaviour
         pieceSelected[0] = -1;
         pieceSelected[1] = -1;
         pieceSelected[2] = 1;// who's turn
+        turnUI.color = new Color(255, 255, 255);
     }
 
 
@@ -189,6 +192,8 @@ internal class BoardState : MonoBehaviour
         board[newX][newY] = board[oldX][oldY];
         board[oldX][oldY] = 0;
         pieceSelected[2] *= -1;
+        if (pieceSelected[2] == -1) turnUI.color = new Color(0, 0, 0);
+        else turnUI.color = new Color(255, 255, 255);
         AllPieces.Instance.UpdateBoard();
         return true; // if valid move
     }
