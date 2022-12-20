@@ -105,8 +105,8 @@ public class BoardInitializer : MonoBehaviour
                 TextMeshProUGUI placeholder = inputSection.transform.GetChild(0).GetChild(1).GetComponent<TextMeshProUGUI>();
                 TextMeshProUGUI liveText = inputSection.transform.GetChild(0).GetChild(2).GetComponent<TextMeshProUGUI>();
 
-                string preX = liveText.text.ToString();
-                string placeX = placeholder.text.ToString();
+                string preX = liveText.text.ToString().ToUpper();
+                string placeX = placeholder.text.ToString().ToUpper();
 
                 if (preX.Length > 1)
                 {
