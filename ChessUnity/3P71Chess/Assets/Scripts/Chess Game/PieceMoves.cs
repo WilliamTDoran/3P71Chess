@@ -24,8 +24,14 @@ public class PieceMoves
         short jump = 1;
         if (start.x == 1 && b[start.x,start.y] < 0 || start.x == 6 && b[start.x,start.y] > 0) jump++;
         ans = BoardState.line(b, start.x, start.y, (short)(-1 * ColourPieces.GetPieceColour(b[start.x,start.y])), 0, jump, false, ColourPieces.GetPieceColour(b[start.x, start.y]));
-        ans = MustCapture(b, (short)(start.x - ColourPieces.GetPieceColour(b[start.x,start.y])), (short)(start.y + 1), ans);
-        ans = MustCapture(b, (short)(start.x - ColourPieces.GetPieceColour(b[start.x,start.y])), (short)(start.y - 1), ans);
+        if (BoardState.check(b,ColourPieces.GetPieceColour(b[start.x,start.y]),start.x,start.y, (short)(start.x - ColourPieces.GetPieceColour(b[start.x, start.y])), (short)(start.y + 1)))
+        {
+            ans = MustCapture(b, (short)(start.x - ColourPieces.GetPieceColour(b[start.x, start.y])), (short)(start.y + 1), ans);
+        }
+        if (BoardState.check(b, ColourPieces.GetPieceColour(b[start.x, start.y]), start.x, start.y, (short)(start.x - ColourPieces.GetPieceColour(b[start.x, start.y])), (short)(start.y - 1)))
+        {
+            ans = MustCapture(b, (short)(start.x - ColourPieces.GetPieceColour(b[start.x, start.y])), (short)(start.y - 1), ans);
+        }
         if (BoardState.Instance.enPassant(b, start, 1)) 
         {
             ans = addMoves(ans, b, start, (short)-BoardState.Instance.pieceSelected[2], 1);

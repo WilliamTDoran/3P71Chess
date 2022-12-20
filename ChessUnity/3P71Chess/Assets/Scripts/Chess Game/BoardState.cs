@@ -106,9 +106,10 @@ internal class BoardState : MonoBehaviour
     {
         int kx;
         int ky;
+        if (!onBoard(fromX, fromY) || !onBoard(toX, toY)) return false;
         short[,] b2 = moveb(b, fromX, fromY, toX, toY);
         AI.BE.FindKing(out kx, out ky, b2, colour);
-        return !ThreatEvaluator.EvaluateThreatened(kx, ky, b2, colour, false, true);
+        return !ThreatEvaluator.EvaluateThreatened(kx, ky, b2, colour, false, true);// true if threatened
     }
 
     public static short[,] moveb(short[,] b, short fromX, short fromY, short toX, short toY)
@@ -191,7 +192,7 @@ internal class BoardState : MonoBehaviour
             foreach (Position p in moves)
             {
                 //Debug.Log(p.x+", "+p.y);
-                if (p.x == newX && p.y == newY && check(b, ColourPieces.GetPieceColour(b[oldX,oldY]), oldX, oldY, newX, newY))
+                if (p.x == newX && p.y == newY /*&& check(b, ColourPieces.GetPieceColour(b[oldX,oldY]), oldX, oldY, newX, newY)*/)
                 {
                     valid = true;
                     break;
@@ -269,8 +270,9 @@ internal class BoardState : MonoBehaviour
     private bool canCastle(short[,] b, short oldX, short oldY, short newX, short newY)
     {
         ColourPieces playing;
+        short colour = pieceSelected[2];
         short row = (short)(7 - (8 + ColourPieces.GetPieceColour(b[oldX,oldY])) % 9);
-        if (pieceSelected[2] == -1) playing = AllPieces.Instance.blackPieces;
+        if (colour == -1) playing = AllPieces.Instance.blackPieces;
         else playing = AllPieces.Instance.whitePieces;
         if (Math.Abs(b[oldX,oldY]) == PieceCode.King)
         {
@@ -278,7 +280,7 @@ internal class BoardState : MonoBehaviour
             {
                 if (newX == row && newY == 6)
                 {
-                    if (playing.canCastleKing && getPiece(row, 5) == 0 && getPiece(row, 6) == 0) 
+                    if (playing.canCastleKing && getPiece(row, 5) == 0 && getPiece(row, 6) == 0 && getPiece(row, 7) == colour * PieceCode.Rook) 
                     {
                         playing.canCastleKing = false;
                         playing.canCastleQueen = false;
@@ -288,7 +290,7 @@ internal class BoardState : MonoBehaviour
                     } 
                 } else if (newX == row && newY == 2)
                 {
-                    if (playing.canCastleQueen && getPiece(row, 1) == 0 && getPiece(row, 2) == 0 && getPiece(row, 3) == 0)
+                    if (playing.canCastleQueen && getPiece(row, 1) == 0 && getPiece(row, 2) == 0 && getPiece(row, 3) == 0 && getPiece(row, 0) == colour * PieceCode.Rook)
                     {
                         playing.canCastleKing = false;
                         playing.canCastleQueen = false;
