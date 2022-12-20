@@ -238,12 +238,20 @@ internal class BoardState : MonoBehaviour
         if (Instance.pieceSelected[2] == -1) Instance.turnUI.color = new Color(0, 0, 0);
         else Instance.turnUI.color = new Color(255, 255, 255);
         AllPieces.Instance.UpdateBoard();
-        Debug.Log(Instance.AITurnVal + ", " + Instance.pieceSelected[2]);
-        if (Instance.AITurnVal == Instance.pieceSelected[2])
+        //Debug.Log(Instance.AITurnVal + ", " + Instance.pieceSelected[2]);
+
+        if (AI.BE.EvaluateCheckmate(Instance.board, Instance.pieceSelected[2]))
         {
-            AITurn();
+            Debug.Log("Checkmate!");
+            Instance.canPlay = false;
+        } else
+        {
+            if (Instance.AITurnVal == Instance.pieceSelected[2])
+            {
+                AITurn();
+            }
+            else Instance.canPlay = true;
         }
-        else Instance.canPlay = true;
     }
 
     public static void AITurn()
