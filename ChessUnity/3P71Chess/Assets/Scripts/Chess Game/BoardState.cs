@@ -43,6 +43,12 @@ internal class BoardState : MonoBehaviour
     internal Position[] lastMove;
 
 
+    public void advanceAIState()
+    {
+        AITurnVal = (AITurnVal + 2) % 3 - 1;
+    }
+
+
     public void Awake()
     {
         instance = this;

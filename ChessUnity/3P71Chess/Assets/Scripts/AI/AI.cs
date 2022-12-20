@@ -21,7 +21,7 @@ public class AI
         depth++;
         if (depth >= maxDepth)
         {
-            n.heuristic = BoardState.Instance.pieceSelected[2] * BE.EvaluateConfiguration(n.config);
+            n.heuristic = BoardState.Instance.AITurnVal * BE.EvaluateConfiguration(n.config);
             //Debug.Log("End Heuristic: " + n.heuristic);
             n.optimalMove = -1;
             return n;
@@ -31,7 +31,7 @@ public class AI
 
         if (n.moves.Length <= 0)
         {
-            n.heuristic = BoardState.Instance.pieceSelected[2] * BE.EvaluateConfiguration(n.config);
+            n.heuristic = BoardState.Instance.AITurnVal * BE.EvaluateConfiguration(n.config);
             n.optimalMove = -1;
             return n;
         }
