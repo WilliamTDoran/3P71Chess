@@ -3014,13 +3014,13 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1407391963}
-        m_TargetAssemblyTypeName: 
-        m_MethodName: 
+      - m_Target: {fileID: 866197513}
+        m_TargetAssemblyTypeName: BoardInitializer, Assembly-CSharp
+        m_MethodName: UpdateBoard
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: 
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -19028,6 +19028,8 @@ MonoBehaviour:
   customButton: {fileID: 131071860}
   backButton: {fileID: 2106581992}
   configMenu: {fileID: 248086352}
+  squaresBasket: {fileID: 1995423530}
+  bs: {fileID: 1407391968}
 --- !u!4 &866197514
 Transform:
   m_ObjectHideFlags: 0
