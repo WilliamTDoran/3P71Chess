@@ -129,7 +129,7 @@ public class BoardInitializer : MonoBehaviour
             short[] lookup = new short[] { -50, -30, -32, -90, -900, -32, -30, -50, -10, -10, -10, -10, -10, -10, -10, -10, 
                                             10, 10, 10, 10, 10, 10, 10, 10, 50, 30, 32, 90, 900, 32, 30, 50 };
 
-            zeroedConfiguration[position[1], position[0]] = lookup[i];
+            zeroedConfiguration[7 - position[1], position[0]] = lookup[i];
         }
 
         return zeroedConfiguration;
