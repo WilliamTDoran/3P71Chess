@@ -121,7 +121,7 @@ internal class BoardState : MonoBehaviour
                 ans[i, k] = b[i, k];
             }
         }
-        Debug.Log(toX + " " + toY + " " + fromX + " " + fromY);
+        //Debug.Log(toX + " " + toY + " " + fromX + " " + fromY);
         ans[toX, toY] = ans[fromX, fromY];
         ans[fromX, fromY] = 0;
         return ans;
@@ -147,15 +147,15 @@ internal class BoardState : MonoBehaviour
         board[7,1] = (short)(PieceCode.white * PieceCode.Knight);
         board[7,2] = (short)(PieceCode.white * PieceCode.Bishop);
         board[7,3] = (short)(PieceCode.white * PieceCode.Queen);
-        board[5,4] = (short)(PieceCode.white * PieceCode.King);
+        board[7,4] = (short)(PieceCode.white * PieceCode.King);
         board[7,5] = (short)(PieceCode.white * PieceCode.Bishop);
         board[7,6] = (short)(PieceCode.white * PieceCode.Knight);
-        board[4,4] = (short)(PieceCode.white * PieceCode.Rook);
+        board[7,7] = (short)(PieceCode.white * PieceCode.Rook);
 
         board[0,0] = (short)(PieceCode.black * PieceCode.Rook);
         board[0,1] = (short)(PieceCode.black * PieceCode.Knight);
         board[0,2] = (short)(PieceCode.black * PieceCode.Bishop);
-        board[3,4] = (short)(PieceCode.black * PieceCode.Queen);
+        board[0,3] = (short)(PieceCode.black * PieceCode.Queen);
         board[0,4] = (short)(PieceCode.black * PieceCode.King);
         board[0,5] = (short)(PieceCode.black * PieceCode.Bishop);
         board[0,6] = (short)(PieceCode.black * PieceCode.Knight);
