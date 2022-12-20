@@ -35,7 +35,7 @@ internal class BoardState : MonoBehaviour
     internal short[] pieceSelected;
     [SerializeField]
     private SpriteRenderer turnUI;
-    internal int AITurnVal = 1;
+    internal int AITurnVal = 0;
     internal bool canPlay = true;
     [SerializeField]
     private BoardInitializer init;

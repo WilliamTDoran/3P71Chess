@@ -158,6 +158,10 @@ public class BoardInitializer : MonoBehaviour
         Debug.Log("Board defined");
         AllPieces.Instance.UpdateBoard();
         Debug.Log("Setup done");
+        if (BoardState.Instance.AITurnVal == 1)
+        {
+            BoardState.AITurn();
+        }
     }
 
 }
