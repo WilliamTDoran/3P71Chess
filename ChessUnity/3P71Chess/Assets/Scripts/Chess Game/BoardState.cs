@@ -89,17 +89,14 @@ internal class BoardState : MonoBehaviour
         else // if in the line & space is taken
         {
 
-            if (b[x, y] * Instance.pieceSelected[2] > 0 || !canCapture && b[x, y] * Instance.pieceSelected[2] < 0) // if same colour
+            if (b[x, y] * Instance.pieceSelected[2] > 0 || !canCapture && b[x, y] * Instance.pieceSelected[2] < 0 || !check(b, colour, (short)(x - changeX), (short)(y - changeY), x, y)) // if same colour
             {
                 pos = new Position[0];
             }
-            else if (check(b, colour, (short)(x - changeX), (short)(y - changeY), x, y)) 
+            else 
             {
                 pos = new Position[1];
                 pos[0] = new Position(x, y);
-            } else
-            {
-                pos = new Position[0];
             }
         }
         return pos;
@@ -124,7 +121,7 @@ internal class BoardState : MonoBehaviour
                 ans[i, k] = b[i, k];
             }
         }
-        Debug.Log(toX + " " + toY + " " + fromX + " " + fromY);
+        //Debug.Log(toX + " " + toY + " " + fromX + " " + fromY);
         ans[toX, toY] = ans[fromX, fromY];
         ans[fromX, fromY] = 0;
         return ans;
@@ -150,15 +147,15 @@ internal class BoardState : MonoBehaviour
         board[7,1] = (short)(PieceCode.white * PieceCode.Knight);
         board[7,2] = (short)(PieceCode.white * PieceCode.Bishop);
         board[7,3] = (short)(PieceCode.white * PieceCode.Queen);
-        board[5,4] = (short)(PieceCode.white * PieceCode.King);
+        board[7,4] = (short)(PieceCode.white * PieceCode.King);
         board[7,5] = (short)(PieceCode.white * PieceCode.Bishop);
         board[7,6] = (short)(PieceCode.white * PieceCode.Knight);
-        board[4,4] = (short)(PieceCode.white * PieceCode.Rook);
+        board[7,7] = (short)(PieceCode.white * PieceCode.Rook);
 
         board[0,0] = (short)(PieceCode.black * PieceCode.Rook);
         board[0,1] = (short)(PieceCode.black * PieceCode.Knight);
         board[0,2] = (short)(PieceCode.black * PieceCode.Bishop);
-        board[3,4] = (short)(PieceCode.black * PieceCode.Queen);
+        board[0,3] = (short)(PieceCode.black * PieceCode.Queen);
         board[0,4] = (short)(PieceCode.black * PieceCode.King);
         board[0,5] = (short)(PieceCode.black * PieceCode.Bishop);
         board[0,6] = (short)(PieceCode.black * PieceCode.Knight);
@@ -194,7 +191,7 @@ internal class BoardState : MonoBehaviour
             foreach (Position p in moves)
             {
                 //Debug.Log(p.x+", "+p.y);
-                if (p.x == newX && p.y == newY)
+                if (p.x == newX && p.y == newY && check(b, ColourPieces.GetPieceColour(b[oldX,oldY]), oldX, oldY, newX, newY))
                 {
                     valid = true;
                     break;
@@ -241,12 +238,20 @@ internal class BoardState : MonoBehaviour
         if (Instance.pieceSelected[2] == -1) Instance.turnUI.color = new Color(0, 0, 0);
         else Instance.turnUI.color = new Color(255, 255, 255);
         AllPieces.Instance.UpdateBoard();
-        Debug.Log(Instance.AITurnVal + ", " + Instance.pieceSelected[2]);
-        if (Instance.AITurnVal == Instance.pieceSelected[2])
+        //Debug.Log(Instance.AITurnVal + ", " + Instance.pieceSelected[2]);
+
+        if (AI.BE.EvaluateCheckmate(Instance.board, Instance.pieceSelected[2]))
         {
-            AITurn();
+            Debug.Log("Checkmate!");
+            Instance.canPlay = false;
+        } else
+        {
+            if (Instance.AITurnVal == Instance.pieceSelected[2])
+            {
+                AITurn();
+            }
+            else Instance.canPlay = true;
         }
-        else Instance.canPlay = true;
     }
 
     public static void AITurn()
