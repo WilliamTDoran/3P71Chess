@@ -148,6 +148,7 @@ public class BoardInitializer : MonoBehaviour
         custom = false;
         customButton.gameObject.SetActive(true);
         configMenu.SetActive(false);
+        UpdateBoard();
     }
 
     public void UpdateBoard()
