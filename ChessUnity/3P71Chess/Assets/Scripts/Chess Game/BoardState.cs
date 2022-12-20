@@ -37,6 +37,8 @@ internal class BoardState : MonoBehaviour
     private SpriteRenderer turnUI;
     internal int AITurnVal = -1;
     internal bool canPlay = true;
+    [SerializeField]
+    private BoardInitializer init;
 
     internal Position[] lastMove;
 
@@ -138,29 +140,7 @@ internal class BoardState : MonoBehaviour
 
     internal void newBoard()
     {
-        board = new short[BoardLength, BoardLength];
-        for (short i=0; i<BoardLength; i++)
-        {
-            board[6,i] = (short)(PieceCode.white * PieceCode.Pawn);
-            board[1,i] = (short)(PieceCode.black * PieceCode.Pawn);
-        }
-        board[7,0] = (short)(PieceCode.white * PieceCode.Rook);
-        board[7,1] = (short)(PieceCode.white * PieceCode.Knight);
-        board[7,2] = (short)(PieceCode.white * PieceCode.Bishop);
-        board[7,3] = (short)(PieceCode.white * PieceCode.Queen);
-        board[7,4] = (short)(PieceCode.white * PieceCode.King);
-        board[7,5] = (short)(PieceCode.white * PieceCode.Bishop);
-        board[7,6] = (short)(PieceCode.white * PieceCode.Knight);
-        board[7,7] = (short)(PieceCode.white * PieceCode.Rook);
-
-        board[0,0] = (short)(PieceCode.black * PieceCode.Rook);
-        board[0,1] = (short)(PieceCode.black * PieceCode.Knight);
-        board[0,2] = (short)(PieceCode.black * PieceCode.Bishop);
-        board[0,3] = (short)(PieceCode.black * PieceCode.Queen);
-        board[0,4] = (short)(PieceCode.black * PieceCode.King);
-        board[0,5] = (short)(PieceCode.black * PieceCode.Bishop);
-        board[0,6] = (short)(PieceCode.black * PieceCode.Knight);
-        board[0,7] = (short)(PieceCode.black * PieceCode.Rook);
+        board = init.LoadBoard();
 
         Debug.Log("Board Created");
 
