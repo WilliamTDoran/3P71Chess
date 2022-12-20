@@ -79,26 +79,21 @@ internal class BoardState : MonoBehaviour
         {
             Position[] pos2 = line(b, x, y, changeX, changeY, (short)(maxRemaining - 1), canCapture, colour);
             pos = pos2;
-            int kx;
-            int ky;
-            AI.BE.FindKing(out kx, out ky, b, colour);
-            if (!ThreatEvaluator.EvaluateThreatened(kx, ky, b, colour, false, true))
+            if (check(b, colour, (short)(x - changeX), (short)(y - changeY), x, y))
             {
                 pos = new Position[pos2.Length + 1];
                 for (short i = 0; i < pos2.Length; i++) pos[i] = pos2[i];
                 pos[pos2.Length] = new Position(x, y);
-            }            
+            }      
         }
         else // if in the line & space is taken
         {
-            int kx;
-            int ky;
-            AI.BE.FindKing(out kx, out ky, b, colour);
-            if (b[x,y] * Instance.pieceSelected[2] > 0 || !canCapture && b[x,y] * Instance.pieceSelected[2] < 0) // if same colour
+
+            if (b[x, y] * Instance.pieceSelected[2] > 0 || !canCapture && b[x, y] * Instance.pieceSelected[2] < 0) // if same colour
             {
                 pos = new Position[0];
             }
-            else if(!ThreatEvaluator.EvaluateThreatened(kx, ky, b, colour, false, true))
+            else if (check(b, colour, (short)(x - changeX), (short)(y - changeY), x, y)) 
             {
                 pos = new Position[1];
                 pos[0] = new Position(x, y);
@@ -108,6 +103,31 @@ internal class BoardState : MonoBehaviour
             }
         }
         return pos;
+    }
+
+    public static bool check(short[,] b, int colour, short fromX, short fromY, short toX, short toY)
+    {
+        int kx;
+        int ky;
+        short[,] b2 = moveb(b, fromX, fromY, toX, toY);
+        AI.BE.FindKing(out kx, out ky, b2, colour);
+        return !ThreatEvaluator.EvaluateThreatened(kx, ky, b2, colour, false, true);
+    }
+
+    public static short[,] moveb(short[,] b, short fromX, short fromY, short toX, short toY)
+    {
+        short[,] ans = new short[b.Length,b.Length];
+        for (int i=0; i<BoardLength; i++)
+        {
+            for (int k=0; k<BoardLength; k++)
+            {
+                ans[i, k] = b[i, k];
+            }
+        }
+        Debug.Log(toX + " " + toY + " " + fromX + " " + fromY);
+        ans[toX, toY] = ans[fromX, fromY];
+        ans[fromX, fromY] = 0;
+        return ans;
     }
 
     internal static bool onBoard(short x, short y)
@@ -130,15 +150,15 @@ internal class BoardState : MonoBehaviour
         board[7,1] = (short)(PieceCode.white * PieceCode.Knight);
         board[7,2] = (short)(PieceCode.white * PieceCode.Bishop);
         board[7,3] = (short)(PieceCode.white * PieceCode.Queen);
-        board[7,4] = (short)(PieceCode.white * PieceCode.King);
+        board[5,4] = (short)(PieceCode.white * PieceCode.King);
         board[7,5] = (short)(PieceCode.white * PieceCode.Bishop);
         board[7,6] = (short)(PieceCode.white * PieceCode.Knight);
-        board[7,7] = (short)(PieceCode.white * PieceCode.Rook);
+        board[4,4] = (short)(PieceCode.white * PieceCode.Rook);
 
         board[0,0] = (short)(PieceCode.black * PieceCode.Rook);
         board[0,1] = (short)(PieceCode.black * PieceCode.Knight);
         board[0,2] = (short)(PieceCode.black * PieceCode.Bishop);
-        board[0,3] = (short)(PieceCode.black * PieceCode.Queen);
+        board[3,4] = (short)(PieceCode.black * PieceCode.Queen);
         board[0,4] = (short)(PieceCode.black * PieceCode.King);
         board[0,5] = (short)(PieceCode.black * PieceCode.Bishop);
         board[0,6] = (short)(PieceCode.black * PieceCode.Knight);
