@@ -50,6 +50,7 @@ namespace AITesting
             Console.WriteLine(board.EvaluateConfiguration(state3));
             Console.WriteLine(board.EvaluateConfiguration(state4));
             Console.WriteLine(board.EvaluateCheckmate(state1, 1));
+            Console.WriteLine('A' - 1);
             Console.WriteLine(state1[7, 0]);
             /*List<int[]> attackers = new List<int[]>();
             Console.WriteLine(ThreatEvaluator.EvaluateThreatened(4, 3, state2, 1, out attackers));
