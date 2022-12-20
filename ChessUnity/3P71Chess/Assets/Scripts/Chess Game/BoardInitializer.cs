@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -14,6 +15,10 @@ public class BoardInitializer : MonoBehaviour
     private Button backButton;
     [SerializeField]
     private GameObject configMenu;
+    [SerializeField]
+    private Transform squaresBasket;
+    [SerializeField]
+    private BoardState bs;
 
     short[,] defaultConfiguration = new short[,] { {  -50,  -30,  -32,  -90, -900,  -32,  -30,  -50 },
                                                    {  -10,  -10,  -10,  -10,  -10,  -10,  -10,  -10 },
@@ -23,6 +28,38 @@ public class BoardInitializer : MonoBehaviour
                                                    {    0,    0,    0,    0,    0,    0,    0,    0 },
                                                    {   10,   10,   10,   10,   10,   10,   10,   10 },
                                                    {   50,   30,   32,   90,  900,   32,   30,   50 } };
+
+    public void Start()
+    {
+        Transform[] childTransforms = new Transform[32];
+
+        for (int i = 0; i < 32; i++)
+        {
+            childTransforms[i] = squaresBasket.GetChild(i);
+        }
+
+        List<GameObject> inputSquares = new List<GameObject>();
+
+        foreach (Transform child in childTransforms)
+        {
+            inputSquares.Add(child.gameObject);
+        }
+
+        for (int i = 0; i < 32; i++)
+        {
+            Transform backing = inputSquares[i].transform.GetChild(0);
+
+            for (int j = 0; j < 2; j++)
+            {
+                GameObject inputSection = backing.GetChild(j + 1).gameObject;
+                TMP_InputField thisInput = inputSection.GetComponent<TMP_InputField>();
+
+                TextMeshProUGUI placeholder = inputSection.transform.GetChild(0).GetChild(0).GetComponent<TextMeshProUGUI>();
+
+                thisInput.placeholder = placeholder;
+            }
+        }
+    }
 
     public short[,] LoadBoard()
     {
@@ -40,13 +77,20 @@ public class BoardInitializer : MonoBehaviour
                                                       {    0,    0,    0,    0,    0,    0,    0,    0 },
                                                       {    0,    0,    0,    0,    0,    0,    0,    0 } };
 
-        Transform[] childTransforms = GetComponentsInChildren<Transform>();
+        Transform[] childTransforms = new Transform[32];
+
+        for (int i = 0; i < 32; i++)
+        {
+            childTransforms[i] = squaresBasket.GetChild(i);
+        }
+
         List<GameObject> inputSquares = new List<GameObject>();
+
         foreach (Transform child in childTransforms)
         {
             inputSquares.Add(child.gameObject);
         }
-        
+
         for (int i = 0; i < 32; i ++)
         {
             Transform backing = inputSquares[i].transform.GetChild(0);
@@ -55,18 +99,28 @@ public class BoardInitializer : MonoBehaviour
 
             for (int j = 0; j < 2; j++)
             {
-                GameObject inputSection = backing.GetChild(i + 1).gameObject;
-                InputField thisInput = inputSection.GetComponent<InputField>();
+                GameObject inputSection = backing.GetChild(j + 1).gameObject;
+                TMP_InputField thisInput = inputSection.GetComponent<TMP_InputField>();
 
-                TextMeshPro placeholder = inputSection.transform.GetChild(0).GetChild(0).GetComponent<TextMeshPro>();
-                TextMeshPro liveText = inputSection.transform.GetChild(0).GetChild(1).GetComponent<TextMeshPro>();
+                TextMeshProUGUI placeholder = inputSection.transform.GetChild(0).GetChild(1).GetComponent<TextMeshProUGUI>();
+                TextMeshProUGUI liveText = inputSection.transform.GetChild(0).GetChild(2).GetComponent<TextMeshProUGUI>();
 
-                thisInput.placeholder = placeholder;
+                string preX = liveText.text.ToString();
+                string placeX = placeholder.text.ToString();
 
-                if (liveText.text.Length == 1)
+                if (preX.Length > 1)
                 {
-                    char x = char.Parse(liveText.text);
-                    int y = x > 8 ? x - 66 : x - 1;
+                    char x = preX[0];
+                    int y = (int)(x - 48);
+                    y = y > 8 ? (y - 17) : (y - 1);
+
+                    position[j] = (short)y;
+                }
+                else
+                {
+                    char x = placeX[0];
+                    int y = (int)(x - 48);
+                    y = y > 8 ? (y - 17) : (y - 1);
 
                     position[j] = (short)y;
                 }
@@ -75,10 +129,10 @@ public class BoardInitializer : MonoBehaviour
             short[] lookup = new short[] { -50, -30, -32, -90, -900, -32, -30, -50, -10, -10, -10, -10, -10, -10, -10, -10, 
                                             10, 10, 10, 10, 10, 10, 10, 10, 50, 30, 32, 90, 900, 32, 30, 50 };
 
-            zeroedConfiguration[position[0], position[1]] = lookup[i];
+            zeroedConfiguration[position[1], position[0]] = lookup[i];
         }
 
-        return null;
+        return zeroedConfiguration;
     }
 
 
@@ -94,6 +148,15 @@ public class BoardInitializer : MonoBehaviour
         custom = false;
         customButton.gameObject.SetActive(true);
         configMenu.SetActive(false);
+    }
+
+    public void UpdateBoard()
+    {
+        Debug.Log("Setup starting");
+        bs.newBoard();
+        Debug.Log("Board defined");
+        AllPieces.Instance.UpdateBoard();
+        Debug.Log("Setup done");
     }
 
 }
