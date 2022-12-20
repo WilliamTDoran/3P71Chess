@@ -15,7 +15,7 @@ namespace AITesting
 {
     internal class BoardEvaluator
     {
-        private const float POSITION_WEIGHT = 0.15f;
+        private const float POSITION_WEIGHT = 1.0f;
 
         private float[,] pawnPositionWeights = new float[,] { {  0.0f,  0.0f,  0.0f,  0.0f,  0.0f,  0.0f,  0.0f,  0.0f },
                                                               {  5.0f,  5.0f,  5.0f,  5.0f,  5.0f,  5.0f,  5.0f,  5.0f },
@@ -85,7 +85,7 @@ namespace AITesting
 
             float sumValue = 0;
 
-            sumValue += EvaluateMaterial(configuration);
+            //sumValue += EvaluateMaterial(configuration);
             sumValue += EvaluatePositions(configuration);
 
             return sumValue;
