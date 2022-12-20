@@ -19032,6 +19032,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d464db7fdce6c874c81537c0cc67a361, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  customButton: {fileID: 131071860}
+  backButton: {fileID: 2106581992}
+  configMenu: {fileID: 248086352}
 --- !u!4 &866197514
 Transform:
   m_ObjectHideFlags: 0
