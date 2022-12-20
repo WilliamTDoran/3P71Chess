@@ -32,11 +32,11 @@ public class PieceMoves
         {
             ans = MustCapture(b, (short)(start.x - ColourPieces.GetPieceColour(b[start.x, start.y])), (short)(start.y - 1), ans);
         }
-        if (BoardState.Instance.enPassant(b, start, 1)) 
+        if (BoardState.Instance.enPassant(b, start, 1, ColourPieces.GetPieceColour(b[start.x, start.y]))) 
         {
             ans = addMoves(ans, b, start, (short)-BoardState.Instance.pieceSelected[2], 1);
         }
-        if (BoardState.Instance.enPassant(b, start, -1))
+        if (BoardState.Instance.enPassant(b, start, -1, ColourPieces.GetPieceColour(b[start.x, start.y])))
         {
             ans = addMoves(ans, b, start, (short)-BoardState.Instance.pieceSelected[2], -1);
         }

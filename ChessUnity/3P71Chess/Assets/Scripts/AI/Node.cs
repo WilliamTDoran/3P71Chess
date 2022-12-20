@@ -9,7 +9,7 @@ public class Node
     internal float heuristic;
     internal short optimalMove;
 
-    public Node(short[,] configuration, Position from, Position to)
+    public Node(short[,] configuration, Position from, Position to, short colour)
     {
 
         config = new short[BoardState.BoardLength,BoardState.BoardLength];
@@ -20,7 +20,7 @@ public class Node
                 config[i, j] = configuration[i, j];
             }
         }
-        BoardState.move(ref config, from.x, from.y, to.x, to.y);
+        BoardState.move(ref config, from.x, from.y, to.x, to.y, colour);
     }
 
     public Node()
@@ -30,28 +30,28 @@ public class Node
 
     internal static void fillMoves(Node n, int turn)
     {
-        string pos = "";
+        //string pos = "";
         n.moves = new Node[0];
         for (short i=0; i<BoardState.BoardLength; i++)
         {
             for (short j=0; j< BoardState.BoardLength; j++)
             {
                 if (n.config[i,j]*turn <= 0) continue;
-                pos = pos + ", " + i + "." + j;
+                //pos = pos + ", " + i + "." + j;
                 Position start = new Position(i, j);
                 Position[] movesPos = PieceMoves.moves(n.config, start);
                 //n.heuristic = BoardState.Instance.pieceSelected[2] * AI.BE.EvaluateConfiguration(n.config);
-                pos = pos + "." +movesPos.Length+":"+n.heuristic+"c:";
+                //pos = pos + "." +movesPos.Length+":"+n.heuristic+"c:";
                 for (short k = 0; k < movesPos.Length; k++)
                 {
-                    n.moves = addMove(n.moves, new Node(n.config, start, movesPos[k]));
+                    n.moves = addMove(n.moves, new Node(n.config, start, movesPos[k], (short)(turn *-1)));
                     n.moves[k].heuristic = BoardState.Instance.pieceSelected[2] * AI.BE.EvaluateConfiguration(n.moves[k].config);
 
-                    pos = pos + n.moves[k].heuristic+"/";
+                    //pos = pos + n.moves[k].heuristic+"/";
                 }
             }
         }
-        Debug.Log(pos);
+        //Debug.Log(pos);
     }
 
 

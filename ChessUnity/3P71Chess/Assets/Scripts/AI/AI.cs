@@ -51,7 +51,7 @@ public class AI
                 {
                     max = other;
                     n.optimalMove = passed;
-                    Debug.Log("Optimal: "+n.optimalMove+", depth: "+depth);
+                    //Debug.Log("Optimal: "+n.optimalMove+", depth: "+depth);
                 }
                 alpha = Math.Max(alpha, bestF);
                 if (beta <= alpha)
@@ -74,7 +74,7 @@ public class AI
                 {
                     min = other;
                     n.optimalMove = passed;
-                    Debug.Log("Optimal: " + n.optimalMove + ", depth: " + depth);
+                    //Debug.Log("Optimal: " + n.optimalMove + ", depth: " + depth);
                 }
                 beta = Math.Min(beta, bestF);
                 if (beta <= alpha)

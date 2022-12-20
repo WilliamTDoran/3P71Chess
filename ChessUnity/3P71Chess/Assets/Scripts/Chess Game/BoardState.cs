@@ -55,6 +55,10 @@ internal class BoardState : MonoBehaviour
         newBoard();
         AllPieces.Instance.UpdateBoard();
         Debug.Log("Setup done");
+        if (AITurnVal == 1)
+        {
+            AITurn();
+        }
     }
 
     internal short getPiece(short x, short y)
@@ -158,14 +162,10 @@ internal class BoardState : MonoBehaviour
         lastMove = new Position[2];
 
         AI.init();
-        if (AITurnVal == 1)
-        {
-            AITurn();
-        }
     }
 
 
-    internal static bool move(ref short[,] b, short oldX, short oldY, short newX, short newY)
+    internal static bool move(ref short[,] b, short oldX, short oldY, short newX, short newY, short colour)
     {
         //check if valid move. Returns false if not
         bool valid = false;
@@ -197,11 +197,11 @@ internal class BoardState : MonoBehaviour
         }
 
         //Em Passant
-        if (Math.Abs(b[oldX,oldY]) == PieceCode.Pawn && Instance.enPassant(b, new Position(oldX, oldY), 1) && newY == oldY + 1) 
+        if (Math.Abs(b[oldX,oldY]) == PieceCode.Pawn && Instance.enPassant(b, new Position(oldX, oldY), 1, colour) && newY == oldY + 1) 
         {
             b[oldX,oldY + 1] = 0;
         }
-        if (Math.Abs(b[oldX,oldY]) == PieceCode.Pawn && Instance.enPassant(b, new Position(oldX, oldY), -1) && newY == oldY - 1)
+        if (Math.Abs(b[oldX,oldY]) == PieceCode.Pawn && Instance.enPassant(b, new Position(oldX, oldY), -1, colour) && newY == oldY - 1)
         {
             b[oldX,oldY - 1] = 0;
         }
@@ -301,10 +301,10 @@ internal class BoardState : MonoBehaviour
         return false;
     }
 
-    public bool enPassant(short[,] b, Position start, short side)
+    public bool enPassant(short[,] b, Position start, short side, int colour)
     {
-        short jump = (short)(-1 * PieceCode.Pawn * pieceSelected[2]);
-        if (((start.y + side) % BoardLength > 0 || start.y + side == 0) && b[start.x,start.y + side] == jump && lastMove[1].x == start.x && lastMove[1].y == start.y + side && lastMove[0].x == start.x - (2 * pieceSelected[2])) return true;
+        short jump = (short)(-1 * PieceCode.Pawn * colour);
+        if (((start.y + side) % BoardLength > 0 || start.y + side == 0) && lastMove[1]!=null && b[start.x,start.y + side] == jump && lastMove[1].x == start.x && lastMove[1].y == start.y + side && lastMove[0].x == start.x - (2 * colour)) return true;
 
         return false;
     }
