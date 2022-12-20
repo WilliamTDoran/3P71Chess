@@ -35,7 +35,7 @@ internal class BoardState : MonoBehaviour
     internal short[] pieceSelected;
     [SerializeField]
     private SpriteRenderer turnUI;
-    internal int AITurnVal = -1;
+    internal int AITurnVal = 1;
     internal bool canPlay = true;
     [SerializeField]
     private BoardInitializer init;
@@ -138,7 +138,7 @@ internal class BoardState : MonoBehaviour
         return on;
     }
 
-    internal void newBoard()
+    public void newBoard()
     {
         board = init.LoadBoard();
 
@@ -158,6 +158,10 @@ internal class BoardState : MonoBehaviour
         lastMove = new Position[2];
 
         AI.init();
+        if (AITurnVal == 1)
+        {
+            AITurn();
+        }
     }
 
 
