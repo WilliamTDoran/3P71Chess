@@ -89,17 +89,14 @@ internal class BoardState : MonoBehaviour
         else // if in the line & space is taken
         {
 
-            if (b[x, y] * Instance.pieceSelected[2] > 0 || !canCapture && b[x, y] * Instance.pieceSelected[2] < 0) // if same colour
+            if (b[x, y] * Instance.pieceSelected[2] > 0 || !canCapture && b[x, y] * Instance.pieceSelected[2] < 0 || !check(b, colour, (short)(x - changeX), (short)(y - changeY), x, y)) // if same colour
             {
                 pos = new Position[0];
             }
-            else if (check(b, colour, (short)(x - changeX), (short)(y - changeY), x, y)) 
+            else 
             {
                 pos = new Position[1];
                 pos[0] = new Position(x, y);
-            } else
-            {
-                pos = new Position[0];
             }
         }
         return pos;
@@ -194,7 +191,7 @@ internal class BoardState : MonoBehaviour
             foreach (Position p in moves)
             {
                 //Debug.Log(p.x+", "+p.y);
-                if (p.x == newX && p.y == newY)
+                if (p.x == newX && p.y == newY && check(b, ColourPieces.GetPieceColour(b[oldX,oldY]), oldX, oldY, newX, newY))
                 {
                     valid = true;
                     break;
